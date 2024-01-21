@@ -36,46 +36,57 @@ namespace Unity.FPS.AI
         public float DeathDuration = 0f;
 
 
-        [Header("Weapons Parameters")] [Tooltip("Allow weapon swapping for this enemy")]
+        [Header("Weapons Parameters")]
+        [Tooltip("Allow weapon swapping for this enemy")]
         public bool SwapToNextWeapon = false;
 
         [Tooltip("Time delay between a weapon swap and the next attack")]
         public float DelayAfterWeaponSwap = 0f;
 
-        [Header("Eye color")] [Tooltip("Material for the eye color")]
+        [Header("Eye color")]
+        [Tooltip("Material for the eye color")]
         public Material EyeColorMaterial;
 
-        [Tooltip("The default color of the bot's eye")] [ColorUsageAttribute(true, true)]
+        [Tooltip("The default color of the bot's eye")]
+        [ColorUsageAttribute(true, true)]
         public Color DefaultEyeColor;
 
-        [Tooltip("The attack color of the bot's eye")] [ColorUsageAttribute(true, true)]
+        [Tooltip("The attack color of the bot's eye")]
+        [ColorUsageAttribute(true, true)]
         public Color AttackEyeColor;
 
-        [Header("Flash on hit")] [Tooltip("The material used for the body of the hoverbot")]
+        [Header("Flash on hit")]
+        [Tooltip("The material used for the body of the hoverbot")]
         public Material BodyMaterial;
 
-        [Tooltip("The gradient representing the color of the flash on hit")] [GradientUsageAttribute(true)]
+        [Tooltip("The gradient representing the color of the flash on hit")]
+        [GradientUsageAttribute(true)]
         public Gradient OnHitBodyGradient;
 
         [Tooltip("The duration of the flash on hit")]
         public float FlashOnHitDuration = 0.5f;
 
-        [Header("Sounds")] [Tooltip("Sound played when recieving damages")]
+        [Header("Sounds")]
+        [Tooltip("Sound played when recieving damages")]
         public AudioClip DamageTick;
 
-        [Header("VFX")] [Tooltip("The VFX prefab spawned when the enemy dies")]
+        [Header("VFX")]
+        [Tooltip("The VFX prefab spawned when the enemy dies")]
         public GameObject DeathVfx;
 
         [Tooltip("The point at which the death VFX is spawned")]
         public Transform DeathVfxSpawnPoint;
 
-        [Header("Loot")] [Tooltip("The object this enemy can drop when dying")]
+        [Header("Loot")]
+        [Tooltip("The object this enemy can drop when dying")]
         public GameObject LootPrefab;
 
-        [Tooltip("The chance the object has to drop")] [Range(0, 1)]
+        [Tooltip("The chance the object has to drop")]
+        [Range(0, 1)]
         public float DropRate = 1f;
 
-        [Header("Debug Display")] [Tooltip("Color of the sphere gizmo representing the path reaching range")]
+        [Header("Debug Display")]
+        [Tooltip("Color of the sphere gizmo representing the path reaching range")]
         public Color PathReachingRangeColor = Color.yellow;
 
         [Tooltip("Color of the sphere gizmo representing the attack range")]
@@ -345,14 +356,14 @@ namespace Unity.FPS.AI
             {
                 // pursue the player
                 DetectionModule.OnDamaged(damageSource);
-                
+
                 onDamaged?.Invoke();
                 m_LastTimeDamaged = Time.time;
-            
+
                 // play the damage tick sound
                 if (DamageTick && !m_WasDamagedThisFrame)
                     AudioUtility.CreateSFX(DamageTick, transform.position, AudioUtility.AudioGroups.DamageTick, 0f);
-            
+
                 m_WasDamagedThisFrame = true;
             }
         }

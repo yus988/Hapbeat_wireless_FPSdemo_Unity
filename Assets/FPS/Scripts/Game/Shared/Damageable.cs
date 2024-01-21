@@ -42,6 +42,9 @@ namespace Unity.FPS.Game
 
                 // apply the damages
                 Health.TakeDamage(totalDamage, damageSource);
+
+                // Hapbeat 
+                // Debug.Log("damaged");
             }
         }
     }

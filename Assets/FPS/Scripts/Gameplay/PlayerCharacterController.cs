@@ -142,6 +142,8 @@ namespace Unity.FPS.Gameplay
         const float k_JumpGroundingPreventionTime = 0.2f;
         const float k_GroundCheckDistanceInAir = 0.07f;
 
+        private SerialHandler _serialhandler;
+
         void Awake()
         {
             ActorsManager actorsManager = FindObjectOfType<ActorsManager>();
@@ -151,6 +153,9 @@ namespace Unity.FPS.Gameplay
 
         void Start()
         {
+            // attach serialhandler
+            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+
             // fetch components on the same gameObject
             m_Controller = GetComponent<CharacterController>();
             DebugUtility.HandleErrorIfNullGetComponent<CharacterController, PlayerCharacterController>(m_Controller,
@@ -195,6 +200,10 @@ namespace Unity.FPS.Gameplay
             // landing
             if (IsGrounded && !wasGrounded)
             {
+                // Hapbeat
+                // Debug.Log("Grounded");
+                _serialhandler.SendSerial("0", "footstep", "neck", 0.2f);
+
                 // Fall damage
                 float fallSpeed = -Mathf.Min(CharacterVelocity.y, m_LatestImpactSpeed.y);
                 float fallSpeedRatio = (fallSpeed - MinSpeedForFallDamage) /
@@ -355,6 +364,9 @@ namespace Unity.FPS.Gameplay
                     {
                         m_FootstepDistanceCounter = 0f;
                         AudioSource.PlayOneShot(FootstepSfx);
+                        // Hapbeat
+                        _serialhandler.SendSerial("0", "footstep", "neck", 0.1f);
+                        // Debug.Log("walk");
                     }
 
                     // keep track of distance traveled for footsteps sound
