@@ -202,7 +202,7 @@ namespace Unity.FPS.Gameplay
             {
                 // Hapbeat
                 // Debug.Log("Grounded");
-                _serialhandler.SendSerial("0", "footstep", "neck", 0.2f);
+                _serialhandler.SendSerial("0", "landing", "neck");
 
                 // Fall damage
                 float fallSpeed = -Mathf.Min(CharacterVelocity.y, m_LatestImpactSpeed.y);

@@ -159,7 +159,7 @@ namespace Unity.FPS.Gameplay
                 if (hasFired)
                 {
                     // hapbeat gun shot
-                    _serialhandler.SendSerial("0", "gunshot", "neck", 0.3f, 0.3f);
+                    _serialhandler.SendSerial("0", "gunshot", "neck");
                     m_AccumulatedRecoil += Vector3.back * activeWeapon.RecoilForce;
                     m_AccumulatedRecoil = Vector3.ClampMagnitude(m_AccumulatedRecoil, MaxRecoilDistance);
                 }

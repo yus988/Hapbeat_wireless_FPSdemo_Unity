@@ -239,7 +239,7 @@ namespace Unity.FPS.Gameplay
             if (collider.name == "Player")
             {
                 Debug.Log("hit Player");
-                _serialhandler.SendSerial("0", "damage", "neck", 0.3f);
+                _serialhandler.SendSerial("0", "damage", "neck");
             }
 
             // damage
