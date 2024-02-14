@@ -1,7 +1,7 @@
 # Hapbeat_wireless_FPSdemo_Unity
+Unity version 2021.3.34f1
 
 1. SerialHandler GameObject を作成し、SerialHandler.cs をアタッチ
-2. 
 
 
 シリアル送信関数
