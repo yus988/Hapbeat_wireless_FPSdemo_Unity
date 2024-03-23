@@ -234,6 +234,7 @@ namespace Unity.FPS.Gameplay
             {
                 // Check if this look input is coming from the mouse
                 bool isGamepad = Input.GetAxis(stickInputName) != 0f;
+                // bool isGamepad = false;
                 float i = isGamepad ? Input.GetAxis(stickInputName) : Input.GetAxisRaw(mouseInputName);
 
                 // handle inverting vertical input

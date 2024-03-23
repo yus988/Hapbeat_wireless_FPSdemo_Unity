@@ -154,7 +154,10 @@ namespace Unity.FPS.Gameplay
         void Start()
         {
             // attach serialhandler
+            // if (GameObject.Find("SerialHandler") != null)
+            // {
             _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            // }
 
             // fetch components on the same gameObject
             m_Controller = GetComponent<CharacterController>();

@@ -1,0 +1,4 @@
+repository "Hapbeat_wireless_FPSdemo_Unity@yus988@cloud"
+  path "/"
+    br "/main"
+    co "/main"
