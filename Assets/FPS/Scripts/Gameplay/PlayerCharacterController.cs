@@ -1,6 +1,7 @@
 ﻿using Unity.FPS.Game;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
 namespace Unity.FPS.Gameplay
 {
@@ -10,6 +11,9 @@ namespace Unity.FPS.Gameplay
         [Header("References")]
         [Tooltip("Reference to the main camera used for the player")]
         public Camera PlayerCamera;
+
+        [Tooltip("Reference to the camera offset to rotate")]
+        public GameObject CameraOffset;
 
         [Tooltip("Audio source for footsteps, jump, etc...")]
         public AudioSource AudioSource;
@@ -290,9 +294,13 @@ namespace Unity.FPS.Gameplay
             // horizontal character rotation
             {
                 // rotate the transform with the input speed around its local Y axis
-                transform.Rotate(
-                    new Vector3(0f, (m_InputHandler.GetLookInputsHorizontal() * RotationSpeed * RotationMultiplier),
-                        0f), Space.Self);
+
+                // transform.Rotate(
+                //     new Vector3(0f, (m_InputHandler.GetLookInputsHorizontal() * RotationSpeed * RotationMultiplier),
+                //         0f), Space.Self);
+
+                CameraOffset.transform.Rotate(
+                    new Vector3(0f, (m_InputHandler.GetLookInputsHorizontal() * RotationSpeed * RotationMultiplier), 0f), Space.Self);
             }
 
             // vertical camera rotation
@@ -304,7 +312,9 @@ namespace Unity.FPS.Gameplay
                 m_CameraVerticalAngle = Mathf.Clamp(m_CameraVerticalAngle, -89f, 89f);
 
                 // apply the vertical angle as a local rotation to the camera transform along its right axis (makes it pivot up and down)
-                PlayerCamera.transform.localEulerAngles = new Vector3(m_CameraVerticalAngle, 0, 0);
+
+                // disable for VR mode
+                // PlayerCamera.transform.localEulerAngles = new Vector3(m_CameraVerticalAngle, 0, 0);
             }
 
             // character movement handling
@@ -317,8 +327,16 @@ namespace Unity.FPS.Gameplay
 
                 float speedModifier = isSprinting ? SprintSpeedModifier : 1f;
 
+                // 移動の向きここを修正
                 // converts move input to a worldspace vector based on our character's transform orientation
-                Vector3 worldspaceMoveInput = transform.TransformVector(m_InputHandler.GetMoveInput());
+                // Vector3 angle = PlayerCamera.transform.localEulerAngles;
+                // Vector3 camVector = new Vector3(Mathf.Cos(angle.y), 0, Mathf.Sin(angle.y)).normalized;
+                // Debug.Log(angle);
+                // Vector3 camVector = new Vector3(1, 1, 1).normalized;
+                Vector3 worldspaceMoveInput = transform.TransformVector(
+                   PlayerCamera.transform.rotation * m_InputHandler.GetMoveInput());
+
+                // Vector3 worldspaceMoveInput = transform.TransformVector(m_InputHandler.GetMoveInput());
 
                 // handle grounded movement
                 if (IsGrounded)
