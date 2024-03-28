@@ -210,10 +210,6 @@ namespace Unity.FPS.Gameplay
             // landing
             if (IsGrounded && !wasGrounded)
             {
-                // Hapbeat
-                // Debug.Log("Grounded");
-                _serialhandler.SendSerial("0", "landing", "neck");
-
                 // Fall damage
                 float fallSpeed = -Mathf.Min(CharacterVelocity.y, m_LatestImpactSpeed.y);
                 float fallSpeedRatio = (fallSpeed - MinSpeedForFallDamage) /
@@ -231,6 +227,10 @@ namespace Unity.FPS.Gameplay
                     // land SFX
                     AudioSource.PlayOneShot(LandSfx);
                 }
+                // Hapbeat
+                Debug.Log(fallSpeed + "/" + fallSpeedRatio);
+                _serialhandler.SendSerial("landing", "neck", "oneshot", 0.5f);
+                // _serialhandler.SendSerial("landing", "neck", "oneshot", fallSpeed / 3);
             }
 
             // crouching
@@ -400,7 +400,7 @@ namespace Unity.FPS.Gameplay
                         m_FootstepDistanceCounter = 0f;
                         AudioSource.PlayOneShot(FootstepSfx);
                         // Hapbeat
-                        _serialhandler.SendSerial("0", "footstep", "neck", 0.1f);
+                        _serialhandler.SendSerial("footstep", "neck", "oneshot", 0.1f);
                         // Debug.Log("walk");
                     }
 

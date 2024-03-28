@@ -234,12 +234,14 @@ namespace Unity.FPS.Gameplay
 
         void OnHit(Vector3 point, Vector3 normal, Collider collider)
         {
+            Debug.Log(collider.name);
+
             // hapbeat
             // プレイヤーに敵の銃弾が当たったら
             if (collider.name == "Player")
             {
                 Debug.Log("hit Player");
-                _serialhandler.SendSerial("0", "damage", "neck");
+                _serialhandler.SendSerial("damage", "neck", "oneshot");
             }
 
             // damage

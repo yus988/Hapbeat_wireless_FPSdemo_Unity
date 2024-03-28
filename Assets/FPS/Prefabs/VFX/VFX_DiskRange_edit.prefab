@@ -169,7 +169,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 46.7
+      scalar: 10
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -4892,7 +4892,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5456729917520863263}
   m_Layer: 0
-  m_Name: VFX_DiskRange
+  m_Name: VFX_DiskRange_edit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4907,7 +4907,7 @@ Transform:
   m_GameObject: {fileID: 4260779743739990948}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.48, y: 0.48, z: 0.48}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7312394324051320181}
@@ -5083,7 +5083,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 83.5
+      scalar: 20
       minScalar: 5
       maxCurve:
         serializedVersion: 2

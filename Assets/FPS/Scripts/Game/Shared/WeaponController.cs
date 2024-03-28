@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.FPS.Gameplay;
 
 namespace Unity.FPS.Game
 {
@@ -166,6 +167,14 @@ namespace Unity.FPS.Game
         const string k_AnimAttackParameter = "Attack";
 
         private Queue<Rigidbody> m_PhysicalAmmoPool;
+
+    
+        private SerialHandler _serialhandler;
+        void Start()
+        {
+            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            // Debug.Log(_serialhandler);
+        }
 
         void Awake()
         {
@@ -420,6 +429,9 @@ namespace Unity.FPS.Game
                 LastChargeTriggerTimestamp = Time.time;
                 IsCharging = true;
 
+                // charge終了=shotなのでloopstopは不要
+                _serialhandler.SendSerial("chargelauncher", "wrist_L", "loopstart");
+                _serialhandler.SendSerial("chargelauncher", "neck", "loopstart");
                 return true;
             }
 
@@ -441,8 +453,27 @@ namespace Unity.FPS.Game
             return false;
         }
 
+        // shootevent
         void HandleShoot()
         {
+            // hapbeat gun shot
+            // change cmd according to gun type
+            if (WeaponName == "Blaster")
+            {
+                _serialhandler.SendSerial("shotblaster", "wrist_L", "oneshot");
+                _serialhandler.SendSerial("shotblaster", "neck", "oneshot");
+            }
+            else if (WeaponName == "Disc Launcher")
+            {
+                _serialhandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
+                _serialhandler.SendSerial("shotlauncher", "neck", "oneshot");
+            }
+            else if (WeaponName == "Shotgun")
+            {
+                _serialhandler.SendSerial("shotshotgun", "wrist_L", "oneshot");
+                _serialhandler.SendSerial("shotshotgun", "neck", "oneshot");
+            }
+
             int bulletsPerShotFinal = ShootType == WeaponShootType.Charge
                 ? Mathf.CeilToInt(CurrentCharge * BulletsPerShot)
                 : BulletsPerShot;

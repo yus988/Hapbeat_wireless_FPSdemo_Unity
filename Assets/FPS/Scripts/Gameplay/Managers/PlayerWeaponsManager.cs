@@ -95,17 +95,12 @@ namespace Unity.FPS.Gameplay
         WeaponSwitchState m_WeaponSwitchState;
         int m_WeaponSwitchNewWeaponIndex;
 
-        // private GameObject GO_SerialHandler;
-        // public GameObject GO_SerialHandler;
-        private SerialHandler _serialhandler;
+        // private SerialHandler _serialhandler;
 
         void Start()
         {
             // Load SerialHandler
-            // _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>;
-            // GO_SerialHandler = GameObject.Find("SerialHandler");
-            // script = GO_SerialHandler.GetComponent<SerialHandler>();
-            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            // _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
 
             ActiveWeaponIndex = -1;
             m_WeaponSwitchState = WeaponSwitchState.Down;
@@ -158,11 +153,6 @@ namespace Unity.FPS.Gameplay
                 // Handle accumulating recoil
                 if (hasFired)
                 {
-                    // hapbeat gun shot
-                    // change cmd according to gun type
-
-                    _serialhandler.SendSerial("0", "gunshot", "neck");
-                    
                     m_AccumulatedRecoil += Vector3.back * activeWeapon.RecoilForce;
                     m_AccumulatedRecoil = Vector3.ClampMagnitude(m_AccumulatedRecoil, MaxRecoilDistance);
                 }
