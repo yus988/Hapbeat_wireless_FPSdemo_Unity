@@ -229,8 +229,8 @@ namespace Unity.FPS.Gameplay
                 }
                 // Hapbeat
                 Debug.Log(fallSpeed + "/" + fallSpeedRatio);
-                _serialhandler.SendSerial("landing", "neck", "oneshot", 0.5f);
-                // _serialhandler.SendSerial("landing", "neck", "oneshot", fallSpeed / 3);
+                // _serialhandler.SendSerial("landing", "neck", "oneshot", 0.5f);
+                _serialhandler.SendSerial("landing", "neck", "oneshot", fallSpeed);
             }
 
             // crouching

@@ -139,7 +139,7 @@ namespace Unity.FPS.Gameplay
                     subid = Random.Range(0, 6).ToString();
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(20, 40).ToString();
+                        c_leftPower = Random.Range(5, 10).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
@@ -149,35 +149,36 @@ namespace Unity.FPS.Gameplay
                 case "footstep":
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
-                    c_leftPower = Random.Range(200, 255).ToString();
+                    c_leftPower = Random.Range(10, 20).ToString();
                     break;
                 case "damage":
                     dataID = "2";
-                    c_leftPower = "130";
+                    c_leftPower = "40";
                     break;
                 case "landing":
                     dataID = "3";
+                    c_leftPower = (leftPower * 0.3f).ToString();
                     break;
                 case "jetpack":
                     dataID = "4";
-                    c_leftPower = "200";
+                    c_leftPower = "20";
                     break;
                 case "chargelauncher":
                     dataID = "5";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(20, 40).ToString();
+                        c_leftPower = Random.Range(10, 20).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = Random.Range(255, 255).ToString();
+                        c_leftPower = "255";
                     }
                     break;
                 case "shotlauncher":
                     dataID = "6";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(20, 40).ToString();
+                        c_leftPower = Random.Range(5, 10).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
@@ -192,7 +193,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "8";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(20, 40).ToString();
+                        c_leftPower = Random.Range(5, 10).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
