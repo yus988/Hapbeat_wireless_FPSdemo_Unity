@@ -258,14 +258,14 @@ namespace Unity.FPS.Gameplay
                 float distance = (this.transform.position - m_ShootPosition).magnitude;
                 Debug.Log("disc explode dist: " + distance);
                 // distance 1--10で重みづけ、それ以下と以上は1と10で固定
-                float volume = (10 - distance) * 0.1f;
+                float volume = (10 - 0.5*distance) * 0.1f;
                 if (volume > 0.8f)
                 {
                     volume = 0.8f;
                 }
-                else if (volume < 0.1f)
+                else if (volume < 0.05f)
                 {
-                    volume = 0.1f;
+                    volume = 0.05f;
                 }
 
                 _serialhandler.SendSerial("hitlauncher", "neck", "oneshot", volume);

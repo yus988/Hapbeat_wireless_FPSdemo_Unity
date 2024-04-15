@@ -149,7 +149,7 @@ namespace Unity.FPS.Gameplay
                 case "footstep":
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
-                    c_leftPower = Random.Range(30, 40).ToString();
+                    c_leftPower = Random.Range(50, 60).ToString();
                     break;
                 case "damage":
                     dataID = "2";
@@ -157,7 +157,7 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "landing":
                     dataID = "3";
-                    c_leftPower = (leftPower * 0.3f).ToString();
+                    c_leftPower = MapToHapbeat(leftPower * 0.3f).ToString();
                     break;
                 case "jetpack":
                     dataID = "4";
@@ -260,6 +260,14 @@ namespace Unity.FPS.Gameplay
             List<string> dataList = new List<string>() { category, wearerID, devicePos, dataID, subid, c_leftPower, c_rightPower, playType };
             string sendData = string.Join(",", dataList);
             Write(sendData);
+
+            if (playType == "2")
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    Write(sendData);
+                }
+            }
             //  Write("0, 0, 0, 0, 100, 100");
         }
     }

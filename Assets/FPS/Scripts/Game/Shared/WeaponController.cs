@@ -168,7 +168,7 @@ namespace Unity.FPS.Game
 
         private Queue<Rigidbody> m_PhysicalAmmoPool;
 
-    
+
         private SerialHandler _serialhandler;
         void Start()
         {
@@ -349,7 +349,7 @@ namespace Unity.FPS.Game
 
             if (show && ChangeWeaponSfx)
             {
-                m_ShootAudioSource.PlayOneShot(ChangeWeaponSfx);
+                // m_ShootAudioSource.PlayOneShot(ChangeWeaponSfx);
             }
 
             IsWeaponActive = show;
@@ -467,6 +467,8 @@ namespace Unity.FPS.Game
             {
                 _serialhandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
                 _serialhandler.SendSerial("shotlauncher", "neck", "oneshot");
+                _serialhandler.SendSerial("shotlauncher", "wrist_L", "loopstop");
+                _serialhandler.SendSerial("shotlauncher", "neck", "loopstop");
             }
             else if (WeaponName == "Shotgun")
             {
