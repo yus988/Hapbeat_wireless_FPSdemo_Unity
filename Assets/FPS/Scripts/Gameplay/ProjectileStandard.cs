@@ -68,6 +68,8 @@ namespace Unity.FPS.Gameplay
         Vector3 m_ConsumedTrajectoryCorrectionVector;
         List<Collider> m_IgnoredColliders;
 
+        Vector3 m_ShootPosition;
+
         const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
         private SerialHandler _serialhandler;
@@ -93,6 +95,10 @@ namespace Unity.FPS.Gameplay
         {
             m_ShootTime = Time.time;
             m_LastRootPosition = Root.position;
+            // habeat 爆発時のプレイヤーとの距離計算に使用
+            // プレイヤーが移動するとずれるが、アバウトで良いので使いやすさで実装。
+            m_ShootPosition = Root.position;
+
             m_Velocity = transform.forward * Speed;
             m_IgnoredColliders = new List<Collider>();
             transform.position += m_ProjectileBase.InheritedMuzzleVelocity * Time.deltaTime;
@@ -234,7 +240,9 @@ namespace Unity.FPS.Gameplay
 
         void OnHit(Vector3 point, Vector3 normal, Collider collider)
         {
-            Debug.Log(collider.name);
+            // Debug.Log("collider.name :" + collider.name);
+            // Debug.Log("collider self :" + this.name);
+
 
             // hapbeat
             // プレイヤーに敵の銃弾が当たったら
@@ -242,6 +250,25 @@ namespace Unity.FPS.Gameplay
             {
                 Debug.Log("hit Player");
                 _serialhandler.SendSerial("damage", "neck", "oneshot");
+            }
+
+            // チャージショットの時だけ爆発出す
+            if (this.name.Contains("Disc"))
+            {
+                float distance = (this.transform.position - m_ShootPosition).magnitude;
+                Debug.Log("disc explode dist: " + distance);
+                // distance 1--10で重みづけ、それ以下と以上は1と10で固定
+                float volume = (10 - distance) * 0.1f;
+                if (volume > 0.8f)
+                {
+                    volume = 0.8f;
+                }
+                else if (volume < 0.1f)
+                {
+                    volume = 0.1f;
+                }
+
+                _serialhandler.SendSerial("hitlauncher", "neck", "oneshot", volume);
             }
 
             // damage

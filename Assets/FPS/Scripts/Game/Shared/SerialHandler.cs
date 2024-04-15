@@ -139,17 +139,17 @@ namespace Unity.FPS.Gameplay
                     subid = Random.Range(0, 6).ToString();
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(5, 10).ToString();
+                        c_leftPower = Random.Range(10, 20).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = Random.Range(255, 255).ToString();
+                        c_leftPower = "255";
                     }
                     break;
                 case "footstep":
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
-                    c_leftPower = Random.Range(10, 20).ToString();
+                    c_leftPower = Random.Range(30, 40).ToString();
                     break;
                 case "damage":
                     dataID = "2";
@@ -167,7 +167,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "5";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(10, 20).ToString();
+                        c_leftPower = "30";
                     }
                     else if (devicePos == "wrist_L")
                     {
@@ -178,26 +178,25 @@ namespace Unity.FPS.Gameplay
                     dataID = "6";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(5, 10).ToString();
+                        c_leftPower = "40";
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = Random.Range(255, 255).ToString();
+                        c_leftPower = "255";
                     }
                     break;
                 case "hitlauncher":
                     dataID = "7";
-                    c_leftPower = "150";
                     break;
                 case "shotshotgun":
                     dataID = "8";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(5, 10).ToString();
+                        c_leftPower = "25";
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = "255";
+                        c_leftPower = "200";
                     }
                     break;
             };
