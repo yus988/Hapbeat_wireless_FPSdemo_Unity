@@ -734,10 +734,10 @@ PlayerSettings:
   apiCompatibilityLevel: 3
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 6cc21f95-5fbc-4804-b5f3-25efcb9f7068
+  cloudProjectId: 1c54b1c3-7a9d-49fb-a448-d7bff87858e1
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: My project
+  projectName: Hapbeat_wireless_FPSdemo_Unity 2024-04-06_23-16-10
   organizationId: yus988
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
