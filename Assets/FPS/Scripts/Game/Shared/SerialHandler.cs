@@ -261,14 +261,23 @@ namespace Unity.FPS.Gameplay
             string sendData = string.Join(",", dataList);
             Write(sendData);
 
+            StartCoroutine(DelayedFunction());
+
             if (playType == "2")
             {
                 for (int i = 0; i < 3; i++)
                 {
                     Write(sendData);
+                    StartCoroutine(DelayedFunction());
                 }
             }
             //  Write("0, 0, 0, 0, 100, 100");
+        }
+
+
+        private IEnumerator DelayedFunction()
+        {
+            yield return new WaitForSeconds(0.001f); // 3秒間処理を遅延させる
         }
     }
 }
