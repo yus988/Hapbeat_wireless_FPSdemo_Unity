@@ -228,7 +228,7 @@ namespace Unity.FPS.Gameplay
                     AudioSource.PlayOneShot(LandSfx);
                 }
                 // Hapbeat
-                Debug.Log(fallSpeed + "/" + fallSpeedRatio);
+                // Debug.Log(fallSpeed + "/" + fallSpeedRatio);
                 // _serialhandler.SendSerial("landing", "neck", "oneshot", 0.5f);
                 _serialhandler.SendSerial("landing", "neck", "oneshot", fallSpeed);
             }

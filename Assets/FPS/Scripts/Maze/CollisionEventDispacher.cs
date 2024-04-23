@@ -7,20 +7,25 @@ using Unity.FPS;
 
 public class CollisionEventDispacher : MonoBehaviour
 {
-    public MazeGimicController maze;
+    private MazeGimicController Maze;
     void Start()
     {
-        maze = maze.GetComponent<MazeGimicController>();
+        Maze = GameObject.Find("MazeGimicController").GetComponent<MazeGimicController>();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        maze.triggerEnterFunc(this.name, other.name);
+        Maze.TriggerEnterFunc(this.name, other.name);
     }
+
+    // private void OnTriggerStay(Collider other)
+    // {
+    //     Maze.triggerStayFunc(this.name, other.name);
+    // }
 
     private void OnTriggerExit(Collider other)
     {
-        maze.triggerExitFunc(this.name, other.name);
+        Maze.TriggerExitFunc(this.name, other.name);
     }
 
     // private void OnCollisionEnter(Collision collision)
