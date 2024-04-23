@@ -8,11 +8,11 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - StaticEnvironment
   - Water
   - UI
-  - 
-  - 
+  - Player
+  - throughPlayer
   - PostProcessing
   - 
   - FirstPersonWeapon

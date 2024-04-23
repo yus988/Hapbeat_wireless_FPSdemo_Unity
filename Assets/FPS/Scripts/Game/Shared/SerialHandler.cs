@@ -45,12 +45,15 @@ namespace Unity.FPS.Gameplay
 
         private void Open()
         {
-            serialPort_ = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
-            serialPort_.Open();
-            serialPort_.ReadTimeout = 100;
-            isRunning_ = true;
-            thread_ = new Thread(Read);
-            thread_.Start();
+            if (portName != "COM")
+            {
+                serialPort_ = new SerialPort(portName, baudRate, Parity.None, 8, StopBits.One);
+                serialPort_.Open();
+                serialPort_.ReadTimeout = 100;
+                isRunning_ = true;
+                thread_ = new Thread(Read);
+                thread_.Start();
+            }
         }
 
         private void Close()
@@ -199,6 +202,16 @@ namespace Unity.FPS.Gameplay
                         c_leftPower = "200";
                     }
                     break;
+                // maze actions
+                case "mazeloop":
+                    break;
+                case "leftNotify":
+                    break;
+                case "rightNotify":
+                    break;
+                case "":
+                                    break;
+
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
             if (c_rightPower == "-1")
