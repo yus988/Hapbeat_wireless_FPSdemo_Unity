@@ -13,7 +13,7 @@ namespace Unity.FPS.Gameplay
         public delegate void SerialDataReceivedEventHandler(string message);
         public event SerialDataReceivedEventHandler OnDataReceived;
 
-         [Tooltip("input COM to ignore")]
+        [Tooltip("input COM to ignore")]
         public string portName = "COM3";
         public int baudRate = 115200;
 
@@ -23,6 +23,9 @@ namespace Unity.FPS.Gameplay
 
         private string message_;
         private bool isNewMessageReceived_ = false;
+
+        // params for reflecting player status
+        public bool _isGhostStepArea = false;
 
         void Awake()
         {
@@ -44,6 +47,7 @@ namespace Unity.FPS.Gameplay
             Close();
         }
 
+        /// Serial control functions
         private void Open()
         {
             if (portName != "COM")
@@ -56,7 +60,6 @@ namespace Unity.FPS.Gameplay
                 // thread_.Start();
             }
         }
-
         private void Close()
         {
             isNewMessageReceived_ = false;
@@ -71,7 +74,6 @@ namespace Unity.FPS.Gameplay
                 serialPort_.Dispose();
             }
         }
-
         private void Read()
         {
             while (isRunning_ && serialPort_ != null && serialPort_.IsOpen)
@@ -87,7 +89,6 @@ namespace Unity.FPS.Gameplay
                 }
             }
         }
-
         public void Write(string message)
         {
             try
@@ -100,6 +101,9 @@ namespace Unity.FPS.Gameplay
             }
         }
 
+
+
+        // // common functions
         float Map(float value, float FromMin, float FromMax, float ToMin, float ToMax)
         {
             return ToMin + (ToMax - ToMin) * ((value - FromMin) / (FromMax - FromMin));
@@ -153,6 +157,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
                     c_leftPower = Random.Range(50, 60).ToString();
+                    Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
                     break;
                 case "damage":
                     dataID = "2";
@@ -206,11 +211,23 @@ namespace Unity.FPS.Gameplay
                 case "mazeloop":
                     break;
                 case "leftNotify":
+                    dataID = "1"; // 仮
                     break;
                 case "rightNotify":
+                    dataID = "1"; // 仮
                     break;
-                case "":
-                                    break;
+                case "heartbeat":
+                    dataID = "2"; // 仮
+                    c_leftPower = "30";
+                    break;
+
+                // 最終、仮
+                case "GhostTrigger1":
+                    dataID = "1"; c_leftPower = "30"; break;
+                case "GhostTrigger2":
+                    dataID = "1"; c_leftPower = "30"; break;
+                case "GhostTrigger3":
+                    dataID = "1"; c_leftPower = "30"; break;
 
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
@@ -218,7 +235,6 @@ namespace Unity.FPS.Gameplay
             {
                 c_rightPower = c_leftPower;
             }
-
 
             switch (devicePos)
             {
@@ -273,24 +289,29 @@ namespace Unity.FPS.Gameplay
             List<string> dataList = new List<string>() { category, wearerID, devicePos, dataID, subid, c_leftPower, c_rightPower, playType };
             string sendData = string.Join(",", dataList);
             Write(sendData);
-
-            StartCoroutine(DelayedFunction());
+            // ghost step
+            if (action == "footstep" && _isGhostStepArea)
+            {
+                // delay randomly
+                float rnd = Random.Range(0.1f, 0.5f);
+                StartCoroutine(DelayedFunction(rnd));
+                Write(sendData);
+            }
 
             if (playType == "2")
             {
                 for (int i = 0; i < 3; i++)
                 {
                     Write(sendData);
-                    StartCoroutine(DelayedFunction());
+                    StartCoroutine(DelayedFunction(0.001f));
                 }
             }
-            //  Write("0, 0, 0, 0, 100, 100");
         }
 
 
-        private IEnumerator DelayedFunction()
+        private IEnumerator DelayedFunction(float sec)
         {
-            yield return new WaitForSeconds(0.001f); // 3秒間処理を遅延させる
+            yield return new WaitForSeconds(sec);
         }
     }
 }

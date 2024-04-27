@@ -401,7 +401,6 @@ namespace Unity.FPS.Gameplay
                         AudioSource.PlayOneShot(FootstepSfx);
                         // Hapbeat
                         _SerialHandler.SendSerial("footstep", "neck", "oneshot");
-                        
                     }
 
                     // keep track of distance traveled for footsteps sound
