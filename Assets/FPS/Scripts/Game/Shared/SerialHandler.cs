@@ -223,11 +223,11 @@ namespace Unity.FPS.Gameplay
 
                 // 最終、仮
                 case "GhostTrigger1":
-                    dataID = "1"; c_leftPower = "30"; break;
+                    dataID = "8"; c_leftPower = "30"; break;
                 case "GhostTrigger2":
-                    dataID = "1"; c_leftPower = "30"; break;
+                    dataID = "8"; c_leftPower = "30"; break;
                 case "GhostTrigger3":
-                    dataID = "1"; c_leftPower = "30"; break;
+                    dataID = "8"; c_leftPower = "30"; break;
 
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
@@ -293,7 +293,7 @@ namespace Unity.FPS.Gameplay
             if (action == "footstep" && _isGhostStepArea)
             {
                 // delay randomly
-                float rnd = Random.Range(0.1f, 0.5f);
+                float rnd = Random.Range(0.5f, 1.0f);
                 StartCoroutine(DelayedFunction(rnd));
                 Write(sendData);
             }
