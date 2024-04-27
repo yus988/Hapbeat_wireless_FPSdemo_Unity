@@ -13,6 +13,7 @@ namespace Unity.FPS.Gameplay
         public delegate void SerialDataReceivedEventHandler(string message);
         public event SerialDataReceivedEventHandler OnDataReceived;
 
+         [Tooltip("input COM to ignore")]
         public string portName = "COM3";
         public int baudRate = 115200;
 
@@ -51,8 +52,8 @@ namespace Unity.FPS.Gameplay
                 serialPort_.Open();
                 serialPort_.ReadTimeout = 100;
                 isRunning_ = true;
-                thread_ = new Thread(Read);
-                thread_.Start();
+                // thread_ = new Thread(Read);
+                // thread_.Start();
             }
         }
 
@@ -91,12 +92,11 @@ namespace Unity.FPS.Gameplay
         {
             try
             {
-                // serialPort_.Write(message);
                 serialPort_.WriteLine(message);
             }
             catch (System.Exception e)
             {
-                Debug.LogWarning(e.Message);
+                // Debug.LogWarning(e.Message);
             }
         }
 

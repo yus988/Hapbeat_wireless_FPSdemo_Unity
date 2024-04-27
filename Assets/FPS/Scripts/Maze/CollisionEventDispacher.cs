@@ -10,7 +10,7 @@ public class CollisionEventDispacher : MonoBehaviour
     private MazeGimicController Maze;
     void Start()
     {
-        Maze = GameObject.Find("MazeGimicController").GetComponent<MazeGimicController>();
+        Maze = GameObject.Find("MazeGimic").GetComponent<MazeGimicController>();
     }
 
     private void OnTriggerEnter(Collider other)

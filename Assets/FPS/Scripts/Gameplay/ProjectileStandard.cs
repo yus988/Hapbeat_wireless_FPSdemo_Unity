@@ -72,11 +72,11 @@ namespace Unity.FPS.Gameplay
 
         const QueryTriggerInteraction k_TriggerInteraction = QueryTriggerInteraction.Collide;
 
-        private SerialHandler _serialhandler;
+        private SerialHandler _SerialHandler;
         void Start()
         {
             // attach serialhandler
-            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
 
         }
 
@@ -249,7 +249,7 @@ namespace Unity.FPS.Gameplay
             if (collider.name == "Player")
             {
                 Debug.Log("hit Player");
-                _serialhandler.SendSerial("damage", "neck", "oneshot");
+                _SerialHandler.SendSerial("damage", "neck", "oneshot");
             }
 
             // チャージショットの時だけ爆発出す
@@ -268,7 +268,7 @@ namespace Unity.FPS.Gameplay
                     volume = 0.1f;
                 }
 
-                _serialhandler.SendSerial("hitlauncher", "neck", "oneshot", volume);
+                _SerialHandler.SendSerial("hitlauncher", "neck", "oneshot", volume);
             }
 
             // damage

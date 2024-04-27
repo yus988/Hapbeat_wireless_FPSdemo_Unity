@@ -149,7 +149,7 @@ namespace Unity.FPS.Gameplay
         const float k_JumpGroundingPreventionTime = 0.2f;
         const float k_GroundCheckDistanceInAir = 0.07f;
 
-        private SerialHandler _serialhandler;
+        private SerialHandler _SerialHandler;
 
         void Awake()
         {
@@ -163,7 +163,7 @@ namespace Unity.FPS.Gameplay
             // attach serialhandler
             // if (GameObject.Find("SerialHandler") != null)
             // {
-            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
             // }
 
             // fetch components on the same gameObject
@@ -229,8 +229,8 @@ namespace Unity.FPS.Gameplay
                 }
                 // Hapbeat
                 // Debug.Log(fallSpeed + "/" + fallSpeedRatio);
-                // _serialhandler.SendSerial("landing", "neck", "oneshot", 0.5f);
-                _serialhandler.SendSerial("landing", "neck", "oneshot", fallSpeed);
+                // _SerialHandler.SendSerial("landing", "neck", "oneshot", 0.5f);
+                _SerialHandler.SendSerial("landing", "neck", "oneshot", fallSpeed);
             }
 
             // crouching
@@ -400,7 +400,8 @@ namespace Unity.FPS.Gameplay
                         m_FootstepDistanceCounter = 0f;
                         AudioSource.PlayOneShot(FootstepSfx);
                         // Hapbeat
-                        _serialhandler.SendSerial("footstep", "neck", "oneshot");
+                        _SerialHandler.SendSerial("footstep", "neck", "oneshot");
+                        
                     }
 
                     // keep track of distance traveled for footsteps sound

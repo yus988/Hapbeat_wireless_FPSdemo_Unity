@@ -55,12 +55,12 @@ namespace Unity.FPS.Gameplay
 
         public UnityAction<bool> OnUnlockJetpack;
 
-        private SerialHandler _serialhandler;
+        private SerialHandler _SerialHandler;
         private bool jetpackFlag = false;
 
         void Start()
         {
-            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
             IsJetpackUnlocked = IsJetpackUnlockedAtStart;
 
             m_PlayerCharacterController = GetComponent<PlayerCharacterController>();
@@ -95,12 +95,12 @@ namespace Unity.FPS.Gameplay
             // 不使用↔使用の状態変化時のみ稼働
             if (jetpackIsInUse && !jetpackFlag)
             {
-                _serialhandler.SendSerial("jetpack", "neck", "loopstart");
+                _SerialHandler.SendSerial("jetpack", "neck", "loopstart");
                 jetpackFlag = true;
             }
             else if (!jetpackIsInUse && jetpackFlag)
             {
-                _serialhandler.SendSerial("jetpack", "neck", "loopstop");
+                _SerialHandler.SendSerial("jetpack", "neck", "loopstop");
                 jetpackFlag = false;
             }
 

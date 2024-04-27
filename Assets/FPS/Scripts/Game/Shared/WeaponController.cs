@@ -169,11 +169,11 @@ namespace Unity.FPS.Game
         private Queue<Rigidbody> m_PhysicalAmmoPool;
 
 
-        private SerialHandler _serialhandler;
+        private SerialHandler _SerialHandler;
         void Start()
         {
-            _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
-            // Debug.Log(_serialhandler);
+            _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            // Debug.Log(_SerialHandler);
         }
 
         void Awake()
@@ -430,8 +430,8 @@ namespace Unity.FPS.Game
                 IsCharging = true;
 
                 // charge終了=shotなのでloopstopは不要
-                _serialhandler.SendSerial("chargelauncher", "wrist_L", "loopstart");
-                _serialhandler.SendSerial("chargelauncher", "neck", "loopstart");
+                _SerialHandler.SendSerial("chargelauncher", "wrist_L", "loopstart");
+                _SerialHandler.SendSerial("chargelauncher", "neck", "loopstart");
                 return true;
             }
 
@@ -460,20 +460,20 @@ namespace Unity.FPS.Game
             // change cmd according to gun type
             if (WeaponName == "Blaster")
             {
-                _serialhandler.SendSerial("shotblaster", "wrist_L", "oneshot");
-                _serialhandler.SendSerial("shotblaster", "neck", "oneshot");
+                _SerialHandler.SendSerial("shotblaster", "wrist_L", "oneshot");
+                _SerialHandler.SendSerial("shotblaster", "neck", "oneshot");
             }
             else if (WeaponName == "Disc Launcher")
             {
-                _serialhandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
-                _serialhandler.SendSerial("shotlauncher", "neck", "oneshot");
-                _serialhandler.SendSerial("shotlauncher", "wrist_L", "loopstop");
-                _serialhandler.SendSerial("shotlauncher", "neck", "loopstop");
+                _SerialHandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
+                _SerialHandler.SendSerial("shotlauncher", "neck", "oneshot");
+                _SerialHandler.SendSerial("shotlauncher", "wrist_L", "loopstop");
+                _SerialHandler.SendSerial("shotlauncher", "neck", "loopstop");
             }
             else if (WeaponName == "Shotgun")
             {
-                _serialhandler.SendSerial("shotshotgun", "wrist_L", "oneshot");
-                _serialhandler.SendSerial("shotshotgun", "neck", "oneshot");
+                _SerialHandler.SendSerial("shotshotgun", "wrist_L", "oneshot");
+                _SerialHandler.SendSerial("shotshotgun", "neck", "oneshot");
             }
 
             int bulletsPerShotFinal = ShootType == WeaponShootType.Charge

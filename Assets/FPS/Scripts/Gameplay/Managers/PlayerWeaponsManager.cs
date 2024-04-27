@@ -95,12 +95,12 @@ namespace Unity.FPS.Gameplay
         WeaponSwitchState m_WeaponSwitchState;
         int m_WeaponSwitchNewWeaponIndex;
 
-        // private SerialHandler _serialhandler;
+        // private SerialHandler _SerialHandler;
 
         void Start()
         {
             // Load SerialHandler
-            // _serialhandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
+            // _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
 
             ActiveWeaponIndex = -1;
             m_WeaponSwitchState = WeaponSwitchState.Down;
