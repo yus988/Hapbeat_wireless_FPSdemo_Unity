@@ -21,6 +21,8 @@ public class MazeGimicController : MonoBehaviour
     [SerializeField] GameObject _FirstFallTrigger;
     [SerializeField] GameObject _TopArea;
 
+    [SerializeField] GameObject _GhostObject;
+
     private GameObject _SecondBranch;
 
     [Header("Attach Parent of Gimic Walls")]
@@ -38,12 +40,26 @@ public class MazeGimicController : MonoBehaviour
 
     public SerialHandler _SerialHandlerScript;
     public float _repeatInterval = 1f; // 実行間隔
+
+    [Header("Ghost params")]
+    public Material GhostMaterial;
+    public float rotationSpeed = 1.0f;
+    public float movementSpeed = 1.0f;
+    public float scaleSpeed = 0.1f;
+    public float finalScale = 100f;
+    // 色変化
+    public Color startColor = Color.red; // 開始色
+    public Color endColor = Color.blue; // 終了色
+    public float durationOfColorVariant = 2.0f; // 変化にかかる時間（秒）
+    private float startTimeColor;
+
+
     // params for notifyingdanger
     private bool _isNotifyingDanger = false;
     private float _timer = 0f;
 
     // last flag
-    private bool[] _finalGhostFlags = { true, true, true };
+    private bool[] _finalGhostFlags = { true, true, true, true };
 
     string[] _correctDir = { "", "" };
     // Start is called before the first frame update
@@ -64,7 +80,8 @@ public class MazeGimicController : MonoBehaviour
                 if (meshRenderer != null) { meshRenderer.enabled = false; }
             }
         }
-        // 壁を消去
+
+        // 壁を消去（リセット）
         foreach (Transform child in _GimicWalls.transform)
         {
             child.gameObject.SetActive(false);
@@ -87,7 +104,7 @@ public class MazeGimicController : MonoBehaviour
             }
             else
             {
-                Debug.Log("Player is in First Area");
+                Debug.Log("Player is in Second Area");
                 distance = Vector3.Distance(_Player.transform.position, _SecondBranch.transform.position);
                 interval = (1 - distance / _maxDistanceOfSecondArea) + 0.3f;
             }
@@ -98,11 +115,47 @@ public class MazeGimicController : MonoBehaviour
                 _timer = 0;
             }
         }
+
+        // お化けの追従方法
+        if (_finalGhostFlags[2] == false)
+        {
+            // プレイヤーの方向を計算
+            Vector3 direction = _Player.transform.position - _GhostObject.transform.position;
+
+            // 対象の方向をプレイヤーの方向に滑らかに回転させる
+            if (Vector3.Distance(_Player.transform.position, _GhostObject.transform.position) > 0.01)
+            {
+                _GhostObject.transform.LookAt(_Player.transform);
+                // 対象を前方に移動させる
+                _GhostObject.transform.Translate(Vector3.forward * movementSpeed * Time.deltaTime);
+            }
+
+            // 対象を拡大させる
+            Vector3 currentScale = _GhostObject.transform.localScale;
+            Vector3 targetScale = new Vector3(finalScale, finalScale, finalScale); // 目標のスケール
+            _GhostObject.transform.localScale = Vector3.Lerp(currentScale, targetScale, scaleSpeed * Time.deltaTime);
+        }
+
+        if (_finalGhostFlags[3] == false)
+        {
+            float t = (Time.time - startTimeColor) / durationOfColorVariant; // 変化の進行度（0.0 ～ 1.0）
+            GhostMaterial.color = Color.Lerp(startColor, endColor, t);
+
+            if (t >= 1.0f)
+            {
+                // 変化が完了したら、開始色と終了色を入れ替えて再度変化させる
+                Color temp = startColor;
+                startColor = endColor;
+                endColor = temp;
+                startTimeColor = Time.time;
+            }
+        }
+
     }
 
     public void TriggerEnterFunc(string colName, string oppName)
     {
-        // Debug.Log("enter: " + colName + ", opponent: " + oppName);
+        Debug.Log("enter: " + colName + ", opponent: " + oppName);
         if (oppName == "PC_Player" || oppName == "VR_Player")
         {
             switch (colName)
@@ -190,9 +243,20 @@ public class MazeGimicController : MonoBehaviour
                         _SerialHandler.SendSerial("GhostTrigger2", "neck", "oneshot");
                     _finalGhostFlags[1] = false; break;
                 case "GhostTrigger3":
+                    // case "GhostTriggerTouch":
                     if (_finalGhostFlags[2])
+                    {
                         _SerialHandler.SendSerial("GhostTrigger3", "neck", "oneshot");
+                        Color tmpColor = GhostMaterial.color;
+                        tmpColor.a = 1f;
+                        GhostMaterial.color = tmpColor;
+                    }
+
                     _finalGhostFlags[2] = false; break;
+                case "Ghost":
+                    _finalGhostFlags[3] = false; break;
+                    break;
+
             }
         }
     }
@@ -204,6 +268,7 @@ public class MazeGimicController : MonoBehaviour
         {
             case "MazeArea":
                 Debug.Log("exit maze area");
+                ResetAll();
                 // stop loop
                 _SerialHandler.SendSerial("mazeloop", "neck", "loopstop"); break;
             case "FirstBranch":
@@ -219,7 +284,10 @@ public class MazeGimicController : MonoBehaviour
             case "RightBotArea":
             case "LeftBotArea":
                 _isNotifyingDanger = false; break;
-                // case "TopArea":
+            // case "TopArea":
+            case "Ghost":
+                _finalGhostFlags[3] = true; break;
+                break;
         }
     }
 
@@ -277,6 +345,16 @@ public class MazeGimicController : MonoBehaviour
 
     }
 
+    // 迷路から抜けた時に実行
+    private void ResetAll()
+    {
+        for (int i = 0; i < _finalGhostFlags.Length; i++)
+        { _finalGhostFlags[i] = true; }
+        foreach (Transform child in _GimicWalls.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
 
 
     /// utilities /

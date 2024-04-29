@@ -157,7 +157,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
                     c_leftPower = Random.Range(50, 60).ToString();
-                    Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
+                    // Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
                     break;
                 case "damage":
                     dataID = "2";
