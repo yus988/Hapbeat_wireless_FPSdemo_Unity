@@ -23,18 +23,12 @@ public class MazeGimicController : MonoBehaviour
 
     private GameObject _SecondBranch;
 
-    [Header("Attach Gimic Walls")]
-    [SerializeField] GameObject _LeftDeadend;
-    [SerializeField] GameObject _RightDeadend;
-    [Header("プレイヤーの行動を制限する壁")]
-    [SerializeField] GameObject[] _ObstacleWalls;
+    [Header("Attach Parent of Gimic Walls")]
+    [SerializeField] GameObject _GimicWalls;
 
     // 子要素の MeshRenderer コンポーネントを無効にするため
     [Header("透明にしたいコライダーを参照")]
     [SerializeField] GameObject[] _Colliders;
-
-    [Header("透明にするマテリアル")]
-    public Material[] _TransparentMaterials; // 透過度を変更するマテリアル
 
     private float _lastTriggerTime;
     // NotifyDanger で distance を0~1までにするために利用する、
@@ -71,7 +65,10 @@ public class MazeGimicController : MonoBehaviour
             }
         }
         // 壁を消去
-        foreach (GameObject obj in _ObstacleWalls) { obj.SetActive(false); }
+        foreach (Transform child in _GimicWalls.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -167,10 +164,22 @@ public class MazeGimicController : MonoBehaviour
                 case "FirstBranch":
                     InvokeRepeating("NotifyLeftOrRight", 0, 1); break;
                 case "SecondBranchLeft":
-                    ChangeLayersRecursively(_LeftDeadend.transform, "throughPlayer"); break;
                 case "SecondBranchRight":
-                    ChangeLayersRecursively(_RightDeadend.transform, "throughPlayer"); break;
-
+                    foreach (Transform child in _GimicWalls.transform)
+                    {
+                        GameObject obj = child.gameObject;
+                        if (_correctDir[0] == "left")
+                        {
+                            if (obj.name == "TransLeftDeadend") obj.SetActive(true);
+                            if (obj.name == "RightDeadend") obj.SetActive(true);
+                        }
+                        else if (_correctDir[0] == "right")
+                        {
+                            if (obj.name == "TransRightDeadend") obj.SetActive(true);
+                            if (obj.name == "LeftDeadend") obj.SetActive(true);
+                        }
+                    }
+                    break;
                 // Manage last trigger events
                 case "GhostTrigger1":
                     if (_finalGhostFlags[0])
@@ -224,11 +233,11 @@ public class MazeGimicController : MonoBehaviour
     /// </summary>
     private void SpawnWall()
     {
-        foreach (GameObject obj in _ObstacleWalls)
+        foreach (Transform child in _GimicWalls.transform)
         {
+            GameObject obj = child.gameObject;
             if (_correctDir[1] == "top" && obj.name.Contains("BotWall") ||
             _correctDir[1] == "bot" && obj.name.Contains("TopWall"))
-            
                 obj.SetActive(true);
         }
 
