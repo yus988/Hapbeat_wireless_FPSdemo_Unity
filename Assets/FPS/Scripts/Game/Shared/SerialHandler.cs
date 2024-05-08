@@ -210,15 +210,27 @@ namespace Unity.FPS.Gameplay
                 // maze actions
                 case "mazeloop":
                     break;
-                case "leftNotify":
+                case "leftnotify":
                     dataID = "1"; // 仮
                     break;
-                case "rightNotify":
+                case "rightnotify":
                     dataID = "1"; // 仮
                     break;
                 case "heartbeat":
                     dataID = "2"; // 仮
                     c_leftPower = "30";
+                    break;
+                case "ghostinvite":
+                    break;
+                case "passwall":
+                    break;
+                case "ghostleft2right":
+                    break;
+                case "ghostright2left":
+                    break;
+                case "ghostcoming":
+                    break;
+                case "ghosteat":
                     break;
 
                 // 最終、仮
@@ -286,7 +298,9 @@ namespace Unity.FPS.Gameplay
                     break;
             }
 
-            List<string> dataList = new List<string>() { category, wearerID, devicePos, dataID, subid, c_leftPower, c_rightPower, playType };
+            List<string> dataList = new List<string>() {
+                category, wearerID, devicePos, dataID, subid, c_leftPower, c_rightPower, playType
+                };
             string sendData = string.Join(",", dataList);
             Write(sendData);
             // ghost step
