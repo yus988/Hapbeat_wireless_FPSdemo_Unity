@@ -246,7 +246,7 @@ namespace Unity.FPS.Gameplay
 
             // hapbeat
             // プレイヤーに敵の銃弾が当たったら
-            if (collider.name == "Player")
+            if (collider.name.Contains("Player"))
             {
                 Debug.Log("hit Player");
                 _SerialHandler.SendSerial("damage", "neck", "oneshot");
