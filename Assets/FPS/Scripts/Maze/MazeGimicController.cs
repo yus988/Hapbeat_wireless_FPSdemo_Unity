@@ -4,7 +4,7 @@ using UnityEngine;
 using Unity.FPS.Gameplay;
 using Unity.FPS;
 using UnityEngine.XR;
-
+using System;
 
 public class MazeGimicController : MonoBehaviour
 {
@@ -42,31 +42,35 @@ public class MazeGimicController : MonoBehaviour
     public float _repeatInterval = 1f; // 実行間隔
 
     [Header("Ghost params")]
-    public Material GhostMaterial;
-    public float rotationSpeed = 1.0f;
-    public float movementSpeed = 1.0f;
-    public float scaleSpeed = 0.1f;
-    public float finalScale = 100f;
+    public Material _GhostMaterial;
+    public float _rotationSpeed = 1.0f;
+    public float _movementSpeed = 1.0f;
+    public float _scaleSpeed = 0.05f;
+    public float _finalScale = 100f;
     // 色変化
-    public Color startColor = Color.red; // 開始色
-    public Color endColor = Color.blue; // 終了色
-    public float durationOfColorVariant = 2.0f; // 変化にかかる時間（秒）
-    private float startTimeColor;
+    public Color _startColor = Color.red; // 開始色
+    public Color _endColor = Color.blue; // 終了色
+    private float _startTimeColor;
+    public float _durationOfColorVariant = 1.0f;
+    public float _fadeDuration = 3.0f;
+    public float _riseHeight = 5.0f;
+    private bool _isFading = false;
+    private Vector3 _originalPosition;
 
-
-    // params for notifyingdanger
+    // params for notifying danger
     private bool _isNotifyingDanger = false;
     private float _timer = 0f;
+    private Coroutine _notifyCoroutine;
 
     // last flag
     private bool[] _finalGhostFlags = { true, true, true, true };
 
     string[] _correctDir = { "", "" };
+
     // Start is called before the first frame update
     void Start()
     {
         _SerialHandler = GameObject.Find("SerialHandler").GetComponent<SerialHandler>();
-        // make invisible of all collidars
 
         if (XRSettings.enabled) { Debug.Log("VRモードです"); _Player = _VR_Player; }
         else { Debug.Log("VRモードではありません"); _Player = _PC_Player; }
@@ -98,13 +102,13 @@ public class MazeGimicController : MonoBehaviour
             float distance; float interval;
             if (_Player.transform.position.z < _FirstFallTrigger.transform.position.z)
             {
-                Debug.Log("Player is in First Area");
+                // Debug.Log("Player is in First Area");
                 distance = Vector3.Distance(_Player.transform.position, _FirstBranch.transform.position);
                 interval = (1 - distance / _maxDistanceOfFirstArea) + 0.3f;
             }
             else
             {
-                Debug.Log("Player is in Second Area");
+                // Debug.Log("Player is in Second Area");
                 distance = Vector3.Distance(_Player.transform.position, _SecondBranch.transform.position);
                 interval = (1 - distance / _maxDistanceOfSecondArea) + 0.3f;
             }
@@ -116,41 +120,74 @@ public class MazeGimicController : MonoBehaviour
             }
         }
 
+        // hearbeat2
         // お化けの追従方法
         if (_finalGhostFlags[2] == false)
         {
+            // // 心臓の鼓動再生
+            _timer += Time.deltaTime;
+            float distance; float interval;
+            distance = Vector3.Distance(_Player.transform.position, _GhostObject.transform.position);
+            // intervalを距離に基づいて計算し、最大1.5f、最小0.3fに制限
+            interval = Mathf.Clamp(distance * 0.1f, 0.3f, 1.5f);
+            if (_timer >= interval && _finalGhostFlags[3] == true)
+            {
+                // 距離に依存する変数を最大0.5、最小0.1の範囲内で設定
+                float volume = Mathf.Clamp(0.5f - distance, 0.1f, 0.5f);
+                _SerialHandler.SendSerial("ghostcoming", "neck", "oneshot", volume);
+                _timer = 0;
+            }
+            // // お化けが近づいてくる
             // プレイヤーの方向を計算
             Vector3 direction = _Player.transform.position - _GhostObject.transform.position;
-
             // 対象の方向をプレイヤーの方向に滑らかに回転させる
             if (Vector3.Distance(_Player.transform.position, _GhostObject.transform.position) > 0.01)
             {
                 _GhostObject.transform.LookAt(_Player.transform);
                 // 対象を前方に移動させる
-                _GhostObject.transform.Translate(Vector3.forward * movementSpeed * Time.deltaTime);
+                _GhostObject.transform.Translate(Vector3.forward * _movementSpeed * Time.deltaTime);
             }
-
             // 対象を拡大させる
             Vector3 currentScale = _GhostObject.transform.localScale;
-            Vector3 targetScale = new Vector3(finalScale, finalScale, finalScale); // 目標のスケール
-            _GhostObject.transform.localScale = Vector3.Lerp(currentScale, targetScale, scaleSpeed * Time.deltaTime);
+            Vector3 targetScale = new Vector3(_finalScale, _finalScale, _finalScale); // 目標のスケール
+            _GhostObject.transform.localScale = Vector3.Lerp(currentScale, targetScale, _scaleSpeed * Time.deltaTime);
         }
 
+        // お化けに食べられた時
         if (_finalGhostFlags[3] == false)
         {
-            float t = (Time.time - startTimeColor) / durationOfColorVariant; // 変化の進行度（0.0 ～ 1.0）
-            GhostMaterial.color = Color.Lerp(startColor, endColor, t);
-
-            if (t >= 1.0f)
+            if (!_isFading)
             {
-                // 変化が完了したら、開始色と終了色を入れ替えて再度変化させる
-                Color temp = startColor;
-                startColor = endColor;
-                endColor = temp;
-                startTimeColor = Time.time;
+                // プレイヤーに触れた時に一度だけ実行
+                _originalPosition = new Vector3(_Player.transform.position.x, _GhostObject.transform.position.y, _Player.transform.position.z);
+                _startTimeColor = Time.time; // 開始時間を記録
+                _isFading = true; // フラグを立てる
+            }
+
+            float elapsed = Time.time - _startTimeColor;
+            if (elapsed <= 2.0f)
+            {
+                float t = (elapsed % _durationOfColorVariant) / _durationOfColorVariant; // 変化の進行度（0.0 ～ 1.0）
+                _GhostMaterial.color = Color.Lerp(_startColor, _endColor, t);
+            }
+            else
+            {
+                // 2秒経過後、透明化を開始
+                float t = (elapsed - 2.0f) / _fadeDuration; // 進行度（0.0 ～ 1.0）
+                t = Mathf.Clamp01(t); // tを0.0から1.0の範囲に制限
+
+                // 徐々に透明に
+                Color newColor = _GhostMaterial.color;
+                newColor.a = Mathf.Lerp(1.0f, 0.0f, t);
+                _GhostMaterial.color = newColor;
+
+                // 透明化が完了したら非アクティブにする
+                if (t >= 1.0f)
+                {
+                    _GhostObject.SetActive(false);
+                }
             }
         }
-
     }
 
     public void TriggerEnterFunc(string colName, string oppName)
@@ -165,7 +202,7 @@ public class MazeGimicController : MonoBehaviour
                     // set correct direction for branches
                     for (int i = 0; i < 2; i++)
                     {
-                        int rnd = Random.Range(0, 2);
+                        int rnd = UnityEngine.Random.Range(0, 2);
                         if (rnd == 0) { _correctDir[i] = (i == 0) ? "left" : "top"; }
                         else { _correctDir[i] = (i == 0) ? "right" : "bot"; }
                     }
@@ -181,43 +218,63 @@ public class MazeGimicController : MonoBehaviour
                 // // first area
                 // // 正解：お化けが後ろからついてくる。誤り：心臓の鼓動が早くなる
                 case "LeftBotBotArea":
+                    // 戻ってきたら足音を復活
+                    _SerialHandlerScript._disableStepFeedBack = false;
                     if (_correctDir[0] == "left") _SerialHandlerScript._isGhostStepArea = true;
-                    else _isNotifyingDanger = true; break;
+                    else _isNotifyingDanger = true;
+                    break;
                 case "RightBotBotArea":
+                    // 戻ってきたら足音を復活
+                    _SerialHandlerScript._disableStepFeedBack = false;
                     if (_correctDir[0] == "right") _SerialHandlerScript._isGhostStepArea = true;
-                    else _isNotifyingDanger = true; break;
+                    else _isNotifyingDanger = true;
+                    break;
                 // // second area
                 case "RightTopArea":
                 case "LeftTopArea":
-                    if (_correctDir[1] == "top") GhostInvitation();
-                    else _isNotifyingDanger = true; break;
+                    if (_correctDir[1] == "top")
+                        _notifyCoroutine = StartCoroutine(RandomlyInvoke(GhostInvitation, 2f, 4f));
+                    else _isNotifyingDanger = true;
+                    break;
                 case "TopArea":
-                    GhostInvitation(); break;
+                    break;
                 case "RightBotArea":
                 case "LeftBotArea":
-                    if (_correctDir[1] == "bot") GhostInvitation();
-                    else _isNotifyingDanger = true; break;
-
+                    if (_correctDir[1] == "bot")
+                        _notifyCoroutine = StartCoroutine(RandomlyInvoke(GhostInvitation, 2f, 4f));
+                    else _isNotifyingDanger = true;
+                    break;
+                case "CenterArea":
+                    _SerialHandler.SendSerial("mazeloop", "neck", "loopstop");
+                    break;
                 // Manage Fall events
                 // // First Area 失敗で落とす
                 case "FallTriggerLeft":
-                    if (_correctDir[0] != "left") FallPlayer(); break;
+                    if (_correctDir[0] != "left") FallPlayer();
+                    break;
                 case "FallTriggerRight":
-                    if (_correctDir[0] != "right") FallPlayer(); break;
+                    if (_correctDir[0] != "right") FallPlayer();
+                    break;
                 // // Second Area 失敗で落とす、正解を通過したら壁を出現させる
                 case "FallTriggerRightTop":
                 case "FallTriggerLeftTop":
                     if (_correctDir[1] != "top") FallPlayer();
-                    else SpawnWall(); break;
+                    else SpawnWall();
+                    break;
                 case "FallTriggerRightBot":
                 case "FallTriggerLeftBot":
                     if (_correctDir[1] != "bot") FallPlayer();
-                    else SpawnWall(); break;
+                    else SpawnWall();
+                    break;
                 // Manage Branch events
                 case "FirstBranch":
-                    InvokeRepeating("NotifyLeftOrRight", 0, 1); break;
+                    _notifyCoroutine = StartCoroutine(RandomlyInvoke(NotifyLeftOrRight, 1f, 3f));
+                    break;
                 case "SecondBranchLeft":
                 case "SecondBranchRight":
+                    // 奥以降は足音を消す
+                    _SerialHandlerScript._disableStepFeedBack = true;
+
                     foreach (Transform child in _GimicWalls.transform)
                     {
                         GameObject obj = child.gameObject;
@@ -233,28 +290,38 @@ public class MazeGimicController : MonoBehaviour
                         }
                     }
                     break;
+                case "TransLeftDeadend":
+                case "TransRightDeadend":
+                    _SerialHandler.SendSerial("passwall", "neck", "oneshot");
+                    break;
                 // Manage last trigger events
                 case "GhostTrigger1":
                     if (_finalGhostFlags[0])
-                        _SerialHandler.SendSerial("GhostTrigger1", "neck", "oneshot");
-                    _finalGhostFlags[0] = false; break;
+                    {
+                        _SerialHandler.SendSerial("ghostleft2right", "neck", "oneshot");
+                        _finalGhostFlags[0] = false;
+                    }
+                    break;
                 case "GhostTrigger2":
                     if (_finalGhostFlags[1])
-                        _SerialHandler.SendSerial("GhostTrigger2", "neck", "oneshot");
-                    _finalGhostFlags[1] = false; break;
+                    {
+                        _SerialHandler.SendSerial("ghostright2left", "neck", "oneshot");
+                        _finalGhostFlags[1] = false;
+                    }
+                    break;
                 case "GhostTrigger3":
                     // case "GhostTriggerTouch":
                     if (_finalGhostFlags[2])
                     {
-                        _SerialHandler.SendSerial("GhostTrigger3", "neck", "oneshot");
-                        Color tmpColor = GhostMaterial.color;
+                        Color tmpColor = _GhostMaterial.color;
                         tmpColor.a = 1f;
-                        GhostMaterial.color = tmpColor;
+                        _GhostMaterial.color = tmpColor;
+                        _finalGhostFlags[2] = false;
                     }
-
-                    _finalGhostFlags[2] = false; break;
+                    break;
                 case "Ghost":
-                    _finalGhostFlags[3] = false; break;
+                    _finalGhostFlags[3] = false;
+                    _SerialHandler.SendSerial("ghosteat", "neck", "oneshot");
                     break;
 
             }
@@ -270,23 +337,31 @@ public class MazeGimicController : MonoBehaviour
                 Debug.Log("exit maze area");
                 ResetAll();
                 // stop loop
-                _SerialHandler.SendSerial("mazeloop", "neck", "loopstop"); break;
+                _SerialHandler.SendSerial("mazeloop", "neck", "loopstop");
+                break;
             case "FirstBranch":
-                CancelInvoke("NotifyLeftOrRight"); break;
+                StopCoroutine(_notifyCoroutine);
+                _notifyCoroutine = null;
+                break;
             case "LeftBotBotArea":
             case "RightBotBotArea":
                 _isNotifyingDanger = false;
-                _SerialHandlerScript._isGhostStepArea = false; break;
-
-
+                _SerialHandlerScript._isGhostStepArea = false;
+                break;
             case "RightTopArea":
             case "LeftTopArea":
             case "RightBotArea":
             case "LeftBotArea":
-                _isNotifyingDanger = false; break;
+                _isNotifyingDanger = false;
+                StopCoroutine(_notifyCoroutine);
+                _notifyCoroutine = null;
+                break;
             // case "TopArea":
             case "Ghost":
-                _finalGhostFlags[3] = true; break;
+                break;
+            case "TransLeftDeadend":
+            case "TransRightDeadend":
+                // _SerialHandler.SendSerial("passwall", "neck", "loopstop");
                 break;
         }
     }
@@ -308,7 +383,17 @@ public class MazeGimicController : MonoBehaviour
             _correctDir[1] == "bot" && obj.name.Contains("TopWall"))
                 obj.SetActive(true);
         }
+    }
 
+    // 特定の関数をランダムな間隔で呼び出す汎用コルーチン
+    private IEnumerator RandomlyInvoke(Action action, float minInterval, float maxInterval)
+    {
+        while (true)
+        {
+            action();
+            float waitTime = UnityEngine.Random.Range(minInterval, maxInterval);
+            yield return new WaitForSeconds(waitTime);
+        }
     }
 
     // functions for repeat in areas
@@ -318,12 +403,12 @@ public class MazeGimicController : MonoBehaviour
         if (_correctDir[0] == "left")
         {
             Debug.Log("turn left");
-            _SerialHandler.SendSerial("leftNotify", "neck");
+            _SerialHandler.SendSerial("leftnotify", "neck");
         }
-        else if (_correctDir[1] == "right")
+        else if (_correctDir[0] == "right")
         {
             Debug.Log("turn right");
-            _SerialHandler.SendSerial("rightNotify", "neck");
+            _SerialHandler.SendSerial("rightnotify", "neck");
         }
     }
 
@@ -334,15 +419,14 @@ public class MazeGimicController : MonoBehaviour
         // 距離をコンソールに出力する
         Debug.Log("Distance to target: " + distance);
         // volume should be within 0--1
-        float volume = distance / _maxDistanceOfFirstArea;
+        float volume = distance / _maxDistanceOfFirstArea * 0.6f;
         _SerialHandler.SendSerial("heartbeat", "neck", "oneshot", volume);
     }
-
 
     // 奥の二股で利用
     private void GhostInvitation()
     {
-
+        _SerialHandler.SendSerial("ghostinvite", "neck", "oneshot");
     }
 
     // 迷路から抜けた時に実行
@@ -356,7 +440,6 @@ public class MazeGimicController : MonoBehaviour
         }
     }
 
-
     /// utilities /
     // 子要素のレイヤー全てを変更する関数
     public void ChangeLayersRecursively(Transform trans, string layerName)
@@ -367,5 +450,4 @@ public class MazeGimicController : MonoBehaviour
             ChangeLayersRecursively(child, layerName);
         }
     }
-
 }

@@ -26,7 +26,7 @@ namespace Unity.FPS.Gameplay
 
         // params for reflecting player status
         public bool _isGhostStepArea = false;
-
+        public bool _disableStepFeedBack = false;
         void Awake()
         {
             Open();
@@ -154,6 +154,9 @@ namespace Unity.FPS.Gameplay
                     }
                     break;
                 case "footstep":
+                    // 奥以降は足音を消す
+                    if (_disableStepFeedBack == true)
+                        return;
                     dataID = "1";
                     subid = Random.Range(0, 2).ToString();
                     c_leftPower = Random.Range(50, 60).ToString();
@@ -165,7 +168,7 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "landing":
                     dataID = "3";
-                    c_leftPower = MapToHapbeat(leftPower * 0.3f).ToString();
+                    c_leftPower = MapToHapbeat(leftPower * 0.01f).ToString();
                     break;
                 case "jetpack":
                     dataID = "4";
@@ -209,38 +212,50 @@ namespace Unity.FPS.Gameplay
                     break;
                 // maze actions
                 case "mazeloop":
+                    dataID = "9";
+                    c_leftPower = "60";
                     break;
                 case "leftnotify":
-                    dataID = "1"; // 仮
+                    dataID = "10";
+                    subid = Random.Range(0, 3).ToString();
+                    c_leftPower = Random.Range(155, 255).ToString();
+                    c_rightPower = "0";
                     break;
                 case "rightnotify":
-                    dataID = "1"; // 仮
+                    dataID = "10";
+                    subid = Random.Range(0, 3).ToString();
+                    c_leftPower = "0";
+                    c_rightPower = Random.Range(155, 255).ToString();
                     break;
                 case "heartbeat":
-                    dataID = "2"; // 仮
-                    c_leftPower = "30";
+                    dataID = "11";
+                    // no need to set power here
                     break;
                 case "ghostinvite":
+                    dataID = "12";
+                    subid = Random.Range(0, 3).ToString();
+                    c_leftPower = "150";
                     break;
                 case "passwall":
+                    dataID = "13";
+                    c_leftPower = "50";
                     break;
                 case "ghostleft2right":
+                    dataID = "14";
+                    c_leftPower = "255";
                     break;
                 case "ghostright2left":
+                    dataID = "15";
+                    c_leftPower = "255";
                     break;
                 case "ghostcoming":
+                    dataID = "16";
+                    // no need to set power here
                     break;
                 case "ghosteat":
+                    dataID = "17";
+                    c_leftPower = "150";
                     break;
-
-                // 最終、仮
-                case "GhostTrigger1":
-                    dataID = "8"; c_leftPower = "30"; break;
-                case "GhostTrigger2":
-                    dataID = "8"; c_leftPower = "30"; break;
-                case "GhostTrigger3":
-                    dataID = "8"; c_leftPower = "30"; break;
-
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
             if (c_rightPower == "-1")
@@ -303,29 +318,28 @@ namespace Unity.FPS.Gameplay
                 };
             string sendData = string.Join(",", dataList);
             Write(sendData);
+
             // ghost step
             if (action == "footstep" && _isGhostStepArea)
             {
                 // delay randomly
-                float rnd = Random.Range(0.5f, 1.0f);
-                StartCoroutine(DelayedFunction(rnd));
-                Write(sendData);
+                float rnd = Random.Range(0.2f, 0.5f);
+                StartCoroutine(DelayedWrite(rnd, sendData));
             }
 
             if (playType == "2")
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Write(sendData);
-                    StartCoroutine(DelayedFunction(0.001f));
+                    StartCoroutine(DelayedWrite(0.01f, sendData));
                 }
             }
         }
 
-
-        private IEnumerator DelayedFunction(float sec)
+        private IEnumerator DelayedWrite(float sec, string sendData)
         {
             yield return new WaitForSeconds(sec);
+            Write(sendData);
         }
     }
 }
