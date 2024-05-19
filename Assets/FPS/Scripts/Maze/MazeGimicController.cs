@@ -44,9 +44,9 @@ public class MazeGimicController : MonoBehaviour
     [Header("Ghost params")]
     public Material _GhostMaterial;
     public float _rotationSpeed = 1.0f;
-    public float _movementSpeed = 1.0f;
+    public float _movementSpeed = 2.0f;
     public float _scaleSpeed = 0.05f;
-    public float _finalScale = 100f;
+    public float _finalScale = 10f;
     // 色変化
     public Color _startColor = Color.red; // 開始色
     public Color _endColor = Color.blue; // 終了色
@@ -213,6 +213,8 @@ public class MazeGimicController : MonoBehaviour
                     _maxDistanceOfSecondArea = Vector3.Distance(_SecondBranch.transform.position, _TopArea.transform.position);
                     Debug.Log("correct dir is: " + _correctDir[0] + " / " + _correctDir[1]);
                     // start loop sound serial
+                    break;
+                case "MazeEntrance":
                     _SerialHandler.SendSerial("mazeloop", "neck", "loopstart");
                     break;
                 // // first area
@@ -245,7 +247,6 @@ public class MazeGimicController : MonoBehaviour
                     else _isNotifyingDanger = true;
                     break;
                 case "CenterArea":
-                    _SerialHandler.SendSerial("mazeloop", "neck", "loopstop");
                     break;
                 // Manage Fall events
                 // // First Area 失敗で落とす
@@ -336,7 +337,8 @@ public class MazeGimicController : MonoBehaviour
             case "MazeArea":
                 Debug.Log("exit maze area");
                 ResetAll();
-                // stop loop
+                break;
+            case "MazeEntrance":
                 _SerialHandler.SendSerial("mazeloop", "neck", "loopstop");
                 break;
             case "FirstBranch":
@@ -388,6 +390,9 @@ public class MazeGimicController : MonoBehaviour
     // 特定の関数をランダムな間隔で呼び出す汎用コルーチン
     private IEnumerator RandomlyInvoke(Action action, float minInterval, float maxInterval)
     {
+        // 初回の遅延
+        float initialDelay = UnityEngine.Random.Range(minInterval, maxInterval);
+        yield return new WaitForSeconds(initialDelay);
         while (true)
         {
             action();

@@ -161,7 +161,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.016464233, g: 0, b: 0.9835357, a: 1}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
-    - _Color: {r: 0.0086631775, g: 0, b: 0.99133676, a: 0}
+    - _Color: {r: 0.002922058, g: 0, b: 0.9970779, a: 0}
     - _ColorAddSubDiff: {r: -1, g: 0, b: 0, a: 0}
     - _DissolveColor: {r: 1, g: 1, b: 1, a: 0}
     - _DissolveRange: {r: 0.5, g: 3, b: 0, a: 0}

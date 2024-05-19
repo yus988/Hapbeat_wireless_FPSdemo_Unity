@@ -214,6 +214,7 @@ namespace Unity.FPS.Gameplay
                 case "mazeloop":
                     dataID = "9";
                     c_leftPower = "60";
+                    // Debug.Log("mazeloop evoked");
                     break;
                 case "leftnotify":
                     dataID = "10";
@@ -242,11 +243,11 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "ghostleft2right":
                     dataID = "14";
-                    c_leftPower = "255";
+                    c_leftPower = "200";
                     break;
                 case "ghostright2left":
                     dataID = "15";
-                    c_leftPower = "255";
+                    c_leftPower = "200";
                     break;
                 case "ghostcoming":
                     dataID = "16";
