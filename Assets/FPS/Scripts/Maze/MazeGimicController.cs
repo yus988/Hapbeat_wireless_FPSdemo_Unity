@@ -62,6 +62,8 @@ public class MazeGimicController : MonoBehaviour
     private float _timer = 0f;
     private Coroutine _notifyCoroutine;
 
+    private Coroutine _notifyDangerCoroutine; // クラスレベルで宣言
+
     // last flag
     private bool[] _finalGhostFlags = { true, true, true, true };
 
@@ -99,23 +101,32 @@ public class MazeGimicController : MonoBehaviour
         {
             _timer += Time.deltaTime;
             // スタート地点（分岐）からの距離に応じて、振動の大きさと鼓動の速さを変える
-            float distance; float interval;
+            float distance;
+            float interval; // 0.3 -- 1.0s の間。
+
             if (_Player.transform.position.z < _FirstFallTrigger.transform.position.z)
             {
                 // Debug.Log("Player is in First Area");
                 distance = Vector3.Distance(_Player.transform.position, _FirstBranch.transform.position);
-                interval = (1 - distance / _maxDistanceOfFirstArea) + 0.3f;
+                interval = Mathf.Lerp(2.0f, 1f, distance / _maxDistanceOfFirstArea);
             }
             else
             {
                 // Debug.Log("Player is in Second Area");
                 distance = Vector3.Distance(_Player.transform.position, _SecondBranch.transform.position);
-                interval = (1 - distance / _maxDistanceOfSecondArea) + 0.3f;
+                interval = Mathf.Lerp(2.0f, 1f, distance / _maxDistanceOfSecondArea);
             }
             // 危険に近づくと段々早く
             if (_timer >= interval)
             {
+                Debug.Log("interval is " + interval + "seconds");
                 NotifyDanger(distance);
+                if (_notifyDangerCoroutine != null)
+                {
+                    StopCoroutine(_notifyDangerCoroutine);
+                }
+                float beatInterval = interval / 4.0f;
+                _notifyDangerCoroutine = StartCoroutine(DelayedNotifyDanger(beatInterval, distance));
                 _timer = 0;
             }
         }
@@ -129,12 +140,20 @@ public class MazeGimicController : MonoBehaviour
             float distance; float interval;
             distance = Vector3.Distance(_Player.transform.position, _GhostObject.transform.position);
             // intervalを距離に基づいて計算し、最大1.5f、最小0.3fに制限
-            interval = Mathf.Clamp(distance * 0.1f, 0.3f, 1.5f);
+            interval = Mathf.Clamp(distance * 0.1f, 1f, 2f);
             if (_timer >= interval && _finalGhostFlags[3] == true)
             {
                 // 距離に依存する変数を最大0.5、最小0.1の範囲内で設定
                 float volume = Mathf.Clamp(0.5f - distance, 0.1f, 0.5f);
                 _SerialHandler.SendSerial("ghostcoming", "neck", "oneshot", volume);
+
+                if (_notifyDangerCoroutine != null)
+                {
+                    StopCoroutine(_notifyDangerCoroutine);
+                }
+                float beatInterval = interval / 4f;
+                _notifyDangerCoroutine = StartCoroutine(DelayedNotifyDanger(beatInterval, distance));
+
                 _timer = 0;
             }
             // // お化けが近づいてくる
@@ -189,6 +208,8 @@ public class MazeGimicController : MonoBehaviour
             }
         }
     }
+
+
 
     public void TriggerEnterFunc(string colName, string oppName)
     {
@@ -269,7 +290,7 @@ public class MazeGimicController : MonoBehaviour
                     break;
                 // Manage Branch events
                 case "FirstBranch":
-                    _notifyCoroutine = StartCoroutine(RandomlyInvoke(NotifyLeftOrRight, 1f, 3f));
+                    _notifyCoroutine = StartCoroutine(RandomlyInvoke(NotifyLeftOrRight, 2f, 3f));
                     break;
                 case "SecondBranchLeft":
                 case "SecondBranchRight":
@@ -420,11 +441,11 @@ public class MazeGimicController : MonoBehaviour
     // 危険を伝える。無視すると落ちる。心臓の鼓動を一定時間ごとに再生
     private void NotifyDanger(float distance)
     {
-        Debug.Log("NotifyDanger");
         // 距離をコンソールに出力する
         Debug.Log("Distance to target: " + distance);
         // volume should be within 0--1
-        float volume = distance / _maxDistanceOfFirstArea * 0.6f;
+        // float volume = distance / _maxDistanceOfFirstArea * 0.2f;
+        float volume = 0.25f * Mathf.Exp(distance / _maxDistanceOfFirstArea - 1);
         _SerialHandler.SendSerial("heartbeat", "neck", "oneshot", volume);
     }
 
@@ -455,4 +476,12 @@ public class MazeGimicController : MonoBehaviour
             ChangeLayersRecursively(child, layerName);
         }
     }
+
+    private IEnumerator DelayedNotifyDanger(float interval, float distance)
+    {
+        // intervalに比例した一定の時間（ミリ秒単位）を空ける
+        yield return new WaitForSeconds(interval);
+        NotifyDanger(distance);
+    }
+
 }

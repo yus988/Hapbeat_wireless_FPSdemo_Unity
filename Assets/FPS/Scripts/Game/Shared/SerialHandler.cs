@@ -230,6 +230,7 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "heartbeat":
                     dataID = "11";
+                    subid = Random.Range(0, 2).ToString();
                     // no need to set power here
                     break;
                 case "ghostinvite":
@@ -243,7 +244,7 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "ghostleft2right":
                     dataID = "14";
-                    c_leftPower = "200";
+                    c_leftPower = "150";
                     break;
                 case "ghostright2left":
                     dataID = "15";
@@ -251,11 +252,12 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "ghostcoming":
                     dataID = "16";
+                    subid = Random.Range(0, 2).ToString();
                     // no need to set power here
                     break;
                 case "ghosteat":
                     dataID = "17";
-                    c_leftPower = "150";
+                    c_leftPower = "80";
                     break;
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
