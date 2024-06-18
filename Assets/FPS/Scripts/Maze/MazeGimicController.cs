@@ -125,8 +125,9 @@ public class MazeGimicController : MonoBehaviour
                 {
                     StopCoroutine(_notifyDangerCoroutine);
                 }
-                float beatInterval = interval / 4.0f;
-                _notifyDangerCoroutine = StartCoroutine(DelayedNotifyDanger(beatInterval, distance));
+                float beatInterval = interval / 4f;
+
+                _notifyDangerCoroutine = StartCoroutine(DelayedNotify(beatInterval, () => NotifyDanger(distance)));
                 _timer = 0;
             }
         }
@@ -152,7 +153,13 @@ public class MazeGimicController : MonoBehaviour
                     StopCoroutine(_notifyDangerCoroutine);
                 }
                 float beatInterval = interval / 4f;
-                _notifyDangerCoroutine = StartCoroutine(DelayedNotifyDanger(beatInterval, distance));
+                if (interval > 0.7f)
+                {
+                    _notifyDangerCoroutine = StartCoroutine(DelayedNotify(beatInterval, () =>
+                    {
+                        _SerialHandler.SendSerial("ghostcoming", "neck", "oneshot", volume);
+                    }));
+                }
 
                 _timer = 0;
             }
@@ -477,11 +484,10 @@ public class MazeGimicController : MonoBehaviour
         }
     }
 
-    private IEnumerator DelayedNotifyDanger(float interval, float distance)
+    private IEnumerator DelayedNotify(float waitTime, Action callback)
     {
-        // intervalに比例した一定の時間（ミリ秒単位）を空ける
-        yield return new WaitForSeconds(interval);
-        NotifyDanger(distance);
+        yield return new WaitForSeconds(waitTime);
+        callback();
     }
 
 }

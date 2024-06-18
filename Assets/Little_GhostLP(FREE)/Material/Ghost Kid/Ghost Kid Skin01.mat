@@ -23,16 +23,15 @@ Material:
   m_Name: Ghost Kid Skin01
   m_Shader: {fileID: 211, guid: 0000000000000000f000000000000000, type: 0}
   m_ValidKeywords:
-  - _ALPHAPREMULTIPLY_ON
+  - _EMISSION
   m_InvalidKeywords:
   - _GLOSSYREFLECTIONS_OFF
   - _SURFACE_TYPE_TRANSPARENT
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 1
-  m_CustomRenderQueue: 3000
-  stringTagMap:
-    RenderType: Transparent
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses:
   - SHADOWCASTER
   - GRABPASS
@@ -113,7 +112,7 @@ Material:
     - _Blend: 0
     - _BlendOp: 0
     - _BumpScale: 1
-    - _CameraFadingEnabled: 0
+    - _CameraFadingEnabled: 1
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
     - _CastShadows: 0
@@ -129,8 +128,8 @@ Material:
     - _DistortionEnabled: 0
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0.1
-    - _DstBlend: 10
-    - _EmissionEnabled: 0
+    - _DstBlend: 0
+    - _EmissionEnabled: 1
     - _EnvironmentReflections: 0
     - _FlipbookMode: 0
     - _GlossMapScale: 0
@@ -138,7 +137,7 @@ Material:
     - _GlossyReflections: 0
     - _LightingEnabled: 0
     - _Metallic: 0
-    - _Mode: 3
+    - _Mode: 0
     - _NoiseScale: 70
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -156,13 +155,13 @@ Material:
     - _UVSec: 0
     - _WorkflowMode: 1
     - _ZTest: 4
-    - _ZWrite: 0
+    - _ZWrite: 1
     - _ZWriteControl: 1
     m_Colors:
     - _BaseColor: {r: 0.016464233, g: 0, b: 0.9835357, a: 1}
-    - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
-    - _Color: {r: 0.0013885498, g: 0, b: 0.9986114, a: 0}
-    - _ColorAddSubDiff: {r: -1, g: 0, b: 0, a: 0}
+    - _CameraFadeParams: {r: 1, g: 1, b: 0, a: 0}
+    - _Color: {r: 0.00010681152, g: 0, b: 0.9998931, a: 0}
+    - _ColorAddSubDiff: {r: -1, g: 1, b: 0, a: 0}
     - _DissolveColor: {r: 1, g: 1, b: 1, a: 0}
     - _DissolveRange: {r: 0.5, g: 3, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

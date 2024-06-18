@@ -161,6 +161,7 @@ namespace Unity.FPS.Gameplay
                     subid = Random.Range(0, 2).ToString();
                     c_leftPower = Random.Range(50, 60).ToString();
                     // Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
+                    playType = "oneshot_bg";
                     break;
                 case "damage":
                     dataID = "2";
@@ -244,11 +245,11 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "ghostleft2right":
                     dataID = "14";
-                    c_leftPower = "150";
+                    c_leftPower = "170";
                     break;
                 case "ghostright2left":
                     dataID = "15";
-                    c_leftPower = "200";
+                    c_leftPower = "170";
                     break;
                 case "ghostcoming":
                     dataID = "16";
@@ -257,7 +258,7 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "ghosteat":
                     dataID = "17";
-                    c_leftPower = "80";
+                    c_leftPower = "100";
                     break;
             };
             // rightPowerについて操作が無ければleftPowerと同じにする
@@ -313,6 +314,9 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "loopstop":
                     playType = "2";
+                    break;
+                case "oneshot_bg":
+                    playType = "3";
                     break;
             }
 
