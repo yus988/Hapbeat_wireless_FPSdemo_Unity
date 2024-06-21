@@ -5,6 +5,9 @@ using Unity.FPS.Gameplay;
 using Unity.FPS;
 using UnityEngine.XR;
 using System;
+using UnityEngine.Events;
+using Unity.FPS.Game;
+using UnityEngine.SceneManagement;
 
 public class MazeGimicController : MonoBehaviour
 {
@@ -47,6 +50,10 @@ public class MazeGimicController : MonoBehaviour
     public float _movementSpeed = 2.0f;
     public float _scaleSpeed = 0.05f;
     public float _finalScale = 10f;
+    // 経過時間を追跡するための変数を追加
+    private float _elapsedTime = 0f;
+    public float _speedIncreaseRate = 0.1f; // 時間経過ごとの速度増加量
+
     // 色変化
     public Color _startColor = Color.red; // 開始色
     public Color _endColor = Color.blue; // 終了色
@@ -61,6 +68,8 @@ public class MazeGimicController : MonoBehaviour
     private bool _isNotifyingDanger = false;
     private float _timer = 0f;
     private Coroutine _notifyCoroutine;
+
+
 
     private Coroutine _notifyDangerCoroutine; // クラスレベルで宣言
 
@@ -138,10 +147,10 @@ public class MazeGimicController : MonoBehaviour
         {
             // // 心臓の鼓動再生
             _timer += Time.deltaTime;
-            float distance; float interval;
+            float distance;
             distance = Vector3.Distance(_Player.transform.position, _GhostObject.transform.position);
             // intervalを距離に基づいて計算し、最大1.5f、最小0.3fに制限
-            interval = Mathf.Clamp(distance * 0.1f, 1f, 2f);
+            float interval = Mathf.Clamp(distance * 0.1f, 0.5f, 1.5f);
             if (_timer >= interval && _finalGhostFlags[3] == true)
             {
                 // 距離に依存する変数を最大0.5、最小0.1の範囲内で設定
@@ -153,25 +162,25 @@ public class MazeGimicController : MonoBehaviour
                     StopCoroutine(_notifyDangerCoroutine);
                 }
                 float beatInterval = interval / 4f;
-                if (interval > 0.7f)
+
+                _notifyDangerCoroutine = StartCoroutine(DelayedNotify(beatInterval, () =>
                 {
-                    _notifyDangerCoroutine = StartCoroutine(DelayedNotify(beatInterval, () =>
-                    {
-                        _SerialHandler.SendSerial("ghostcoming", "neck", "oneshot", volume);
-                    }));
-                }
+                    _SerialHandler.SendSerial("ghostcoming", "neck", "oneshot", volume);
+                }));
 
                 _timer = 0;
             }
             // // お化けが近づいてくる
             // プレイヤーの方向を計算
+            _elapsedTime += Time.deltaTime; // 経過時間を更新
             Vector3 direction = _Player.transform.position - _GhostObject.transform.position;
             // 対象の方向をプレイヤーの方向に滑らかに回転させる
             if (Vector3.Distance(_Player.transform.position, _GhostObject.transform.position) > 0.01)
             {
                 _GhostObject.transform.LookAt(_Player.transform);
                 // 対象を前方に移動させる
-                _GhostObject.transform.Translate(Vector3.forward * _movementSpeed * Time.deltaTime);
+                float currentSpeed = _movementSpeed + (_elapsedTime * _speedIncreaseRate);
+                _GhostObject.transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
             }
             // 対象を拡大させる
             Vector3 currentScale = _GhostObject.transform.localScale;
@@ -207,10 +216,12 @@ public class MazeGimicController : MonoBehaviour
                 newColor.a = Mathf.Lerp(1.0f, 0.0f, t);
                 _GhostMaterial.color = newColor;
 
-                // 透明化が完了したら非アクティブにする
+                // 透明化が完了したら非アクティブにし、入口に戻す（シーンの再リロード）
                 if (t >= 1.0f)
                 {
                     _GhostObject.SetActive(false);
+                    SceneManager.LoadScene("MainScene");
+                    // EventManager.Broadcast(Events.PlayerDeathEvent);
                 }
             }
         }

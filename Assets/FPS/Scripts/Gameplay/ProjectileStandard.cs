@@ -257,17 +257,21 @@ namespace Unity.FPS.Gameplay
             {
                 float distance = (this.transform.position - m_ShootPosition).magnitude;
                 Debug.Log("disc explode dist: " + distance);
-                // distance 1--10で重みづけ、それ以下と以上は1と10で固定
-                float volume = (10f - 0.5f * distance) * 0.1f;
-                if (volume > 0.8f)
-                {
-                    volume = 0.8f;
-                }
-                else if (volume < 0.1f)
-                {
-                    volume = 0.1f;
-                }
 
+                float maxVolume = 0.2f;
+                float minVolume = 0.05f;
+                float maxDistance = 10f;
+                float minDistance = 1f;
+                if (distance < minDistance)
+                {
+                    distance = minDistance;
+                }
+                else if (distance > maxDistance)
+                {
+                    distance = maxDistance;
+                }
+                // distanceが minDistance のとき maxVolume、maxDistance のとき minVolume になるように線形補間
+                float volume = maxVolume - (distance - minDistance) / (maxDistance - minDistance) * (maxVolume - minVolume);
                 _SerialHandler.SendSerial("hitlauncher", "neck", "oneshot", volume);
             }
 

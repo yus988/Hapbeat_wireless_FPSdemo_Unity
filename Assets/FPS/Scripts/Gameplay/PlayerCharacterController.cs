@@ -227,10 +227,21 @@ namespace Unity.FPS.Gameplay
                     // land SFX
                     AudioSource.PlayOneShot(LandSfx);
                 }
+
+                float maxFallSpeed = 30f; // 最大のfallSpeed
+                float minFallSpeed = 9f;  // 最小のfallSpeed
+                float maxValue = 0.2f;    // 最大の補間値
+                float minValue = 0.05f;    // 最小の補間値
+                                          // fallSpeedが minFallSpeed 未満の場合は minFallSpeed に、maxFallSpeed を超える場合は maxFallSpeed に固定します
+                                          // fallSpeedが minFallSpeed 未満の場合は minFallSpeed に、maxFallSpeed を超える場合は maxFallSpeed に固定します
+                fallSpeed = Mathf.Clamp(fallSpeed, minFallSpeed, maxFallSpeed);
+
+                // fallSpeedが minFallSpeed のとき minValue、maxFallSpeed のとき maxValue になるように線形補間
+                float interpolatedValue = Mathf.Lerp(minValue, maxValue, (fallSpeed - minFallSpeed) / (maxFallSpeed - minFallSpeed));
                 // Hapbeat
                 // Debug.Log(fallSpeed + "/" + fallSpeedRatio);
                 // _SerialHandler.SendSerial("landing", "neck", "oneshot", 0.5f);
-                _SerialHandler.SendSerial("landing", "neck", "oneshot", fallSpeed);
+                _SerialHandler.SendSerial("landing", "neck", "oneshot", interpolatedValue);
             }
 
             // crouching

@@ -165,11 +165,10 @@ namespace Unity.FPS.Gameplay
                     break;
                 case "damage":
                     dataID = "2";
-                    c_leftPower = "40";
+                    c_leftPower = "30";
                     break;
                 case "landing":
                     dataID = "3";
-                    c_leftPower = MapToHapbeat(leftPower * 0.01f).ToString();
                     break;
                 case "jetpack":
                     dataID = "4";
@@ -179,7 +178,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "5";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = "30";
+                        c_leftPower = "20";
                     }
                     else if (devicePos == "wrist_L")
                     {
@@ -190,7 +189,7 @@ namespace Unity.FPS.Gameplay
                     dataID = "6";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = "40";
+                        c_leftPower = "30";
                     }
                     else if (devicePos == "wrist_L")
                     {
@@ -330,17 +329,17 @@ namespace Unity.FPS.Gameplay
             if (action == "footstep" && _isGhostStepArea)
             {
                 // delay randomly
-                float rnd = Random.Range(0.2f, 0.5f);
+                float rnd = Random.Range(0.1f, 0.3f);
                 StartCoroutine(DelayedWrite(rnd, sendData));
             }
 
-            if (playType == "2")
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    StartCoroutine(DelayedWrite(0.01f, sendData));
-                }
-            }
+            // if (playType == "2")
+            // {
+            //     for (int i = 0; i < 2; i++)
+            //     {
+            //         StartCoroutine(DelayedWrite(0.1f, sendData));
+            //     }
+            // }
         }
 
         private IEnumerator DelayedWrite(float sec, string sendData)

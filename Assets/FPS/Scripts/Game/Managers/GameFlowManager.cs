@@ -81,6 +81,7 @@ namespace Unity.FPS.Game
             if (win)
             {
                 m_SceneToLoad = WinSceneName;
+                
                 m_TimeLoadEndGameScene = Time.time + EndSceneLoadDelay + DelayBeforeFadeToBlack;
 
                 // play a sound on win
