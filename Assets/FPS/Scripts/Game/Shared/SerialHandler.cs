@@ -146,11 +146,11 @@ namespace Unity.FPS.Gameplay
                     subid = Random.Range(0, 6).ToString();
                     if (devicePos == "neck")
                     {
-                        c_leftPower = Random.Range(10, 20).ToString();
+                        c_leftPower = Random.Range(20, 35).ToString();
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = "255";
+                        c_leftPower = Random.Range(100, 155).ToString();
                     }
                     break;
                 case "footstep":
@@ -158,9 +158,11 @@ namespace Unity.FPS.Gameplay
                     if (_disableStepFeedBack == true)
                         return;
                     dataID = "1";
+                    // subid = "0";
                     subid = Random.Range(0, 2).ToString();
-                    c_leftPower = Random.Range(50, 60).ToString();
+                    c_leftPower = Random.Range(40, 60).ToString();
                     // Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
+                    // playType = "oneshot";
                     playType = "oneshot_bg";
                     break;
                 case "damage":
@@ -182,18 +184,18 @@ namespace Unity.FPS.Gameplay
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = "255";
+                        c_leftPower = "100";
                     }
                     break;
                 case "shotlauncher":
                     dataID = "6";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = "30";
+                        c_leftPower = "35";
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = "255";
+                        c_leftPower = Random.Range(200, 255).ToString();
                     }
                     break;
                 case "hitlauncher":
@@ -203,11 +205,11 @@ namespace Unity.FPS.Gameplay
                     dataID = "8";
                     if (devicePos == "neck")
                     {
-                        c_leftPower = "25";
+                        c_leftPower = "20";
                     }
                     else if (devicePos == "wrist_L")
                     {
-                        c_leftPower = "200";
+                        c_leftPower = Random.Range(100, 155).ToString();
                     }
                     break;
                 // maze actions
@@ -301,6 +303,9 @@ namespace Unity.FPS.Gameplay
                 case "calf_R":
                     devicePos = "10";
                     break;
+                case "all":
+                    devicePos = "99";
+                    break;
             };
 
             switch (playType)
@@ -333,13 +338,13 @@ namespace Unity.FPS.Gameplay
                 StartCoroutine(DelayedWrite(rnd, sendData));
             }
 
-            // if (playType == "2")
-            // {
-            //     for (int i = 0; i < 2; i++)
-            //     {
-            //         StartCoroutine(DelayedWrite(0.1f, sendData));
-            //     }
-            // }
+            if (playType == "2")
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    StartCoroutine(DelayedWrite(0.1f, sendData));
+                }
+            }
         }
 
         private IEnumerator DelayedWrite(float sec, string sendData)
