@@ -467,6 +467,7 @@ namespace Unity.FPS.Game
             {
                 _SerialHandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
                 _SerialHandler.SendSerial("shotlauncher", "neck", "oneshot");
+                _SerialHandler.SendSerial("shotlauncher", "wrist_L", "loopstop");
                 _SerialHandler.SendSerial("shotlauncher", "neck", "loopstop");
             }
             else if (WeaponName == "Shotgun")
