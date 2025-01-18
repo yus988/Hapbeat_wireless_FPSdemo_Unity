@@ -4,12 +4,379 @@ using System.Threading;
 using UnityEngine;
 using System.Collections.Generic;
 
-//ref: https://qiita.com/ZAP_xgame/items/9487aeddd3b9fa9a8f1d
-// namespace Unity.FPS.Gameplay
 namespace Unity.FPS.Gameplay
 {
     public class SerialHandler : MonoBehaviour
     {
+
+        // デバイス位置ごとのパワー設定を定義する構造体
+        [System.Serializable]
+
+        // シリアライズ可能なディクショナリ
+        public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
+        {
+            [SerializeField]
+            private List<TKey> keys = new List<TKey>();
+
+            [SerializeField]
+            private List<TValue> values = new List<TValue>();
+
+            public void OnBeforeSerialize()
+            {
+                keys.Clear();
+                values.Clear();
+                foreach (KeyValuePair<TKey, TValue> pair in this)
+                {
+                    keys.Add(pair.Key);
+                    values.Add(pair.Value);
+                }
+            }
+
+            public void OnAfterDeserialize()
+            {
+                this.Clear();
+
+                if (keys.Count != values.Count)
+                    throw new System.Exception(string.Format("there are {0} keys and {1} values after deserialization. Make sure that both key and value types are serializable.", keys.Count, values.Count));
+
+                for (int i = 0; i < keys.Count; i++)
+                    this.Add(keys[i], values[i]);
+            }
+        }
+
+        // アクション設定を定義する構造体
+        [System.Serializable]
+        public struct ActionSettings
+        {
+            public string dataID;
+            [SerializeField]
+            public SerializableDictionary<string, DevicePowerSettings> devicePowers;
+            public bool useRandomSubID;
+            public Vector2Int subIDRange;
+            public bool useRandomPower;
+            public Vector2Int randomPowerRange;
+
+            public ActionSettings(
+                string dataID,
+                SerializableDictionary<string, DevicePowerSettings> devicePowers = null,
+                bool useRandomSubID = false,
+                Vector2Int subIDRange = new Vector2Int(),
+                bool useRandomPower = false,
+                Vector2Int randomPowerRange = new Vector2Int())
+            {
+                this.dataID = dataID;
+                this.devicePowers = devicePowers ?? new SerializableDictionary<string, DevicePowerSettings>();
+                this.useRandomSubID = useRandomSubID;
+                this.subIDRange = subIDRange;
+                this.useRandomPower = useRandomPower;
+                this.randomPowerRange = randomPowerRange;
+            }
+        }
+
+        //===============================================
+        // アプリに応じて変更 カテゴリ分け
+        //===============================================
+
+        [Header("Communication Parameters")]
+        public string Category = "0";      // チャンネル。アプリケーションごとに変えるなど
+        public string WearerID = "0";      // 複数人数で別々の信号を出したいとき
+
+        [Header("Action Settings")]
+        [SerializeField]
+        private SerializableDictionary<string, ActionSettings> actionSettings = new SerializableDictionary<string, ActionSettings>();
+
+
+        // まず構造体を修正
+        [System.Serializable]
+        public struct DevicePowerSettings
+        {
+            public Vector2Int leftPowerRange;  // MinとMaxを指定。Max=Minの場合は固定値として扱う
+            public Vector2Int rightPowerRange; // MinとMaxを指定。Max=Minの場合は固定値として扱う
+
+            public DevicePowerSettings(int leftPower)
+                : this(new Vector2Int(leftPower, leftPower), new Vector2Int(leftPower, leftPower))
+            {
+            }
+
+            public DevicePowerSettings(Vector2Int leftPowerRange)
+                : this(leftPowerRange, leftPowerRange)
+            {
+            }
+
+            public DevicePowerSettings(Vector2Int leftPowerRange, Vector2Int rightPowerRange)
+            {
+                this.leftPowerRange = leftPowerRange;
+                this.rightPowerRange = rightPowerRange;
+            }
+
+            public bool IsLeftPowerRandom => leftPowerRange.x != leftPowerRange.y;
+            public bool IsRightPowerRandom => rightPowerRange.x != rightPowerRange.y;
+        }
+
+        // アクション設定の初期化
+        private void InitializeActionSettings()
+        {
+            actionSettings = new SerializableDictionary<string, ActionSettings>()
+    {
+        // 武器関連
+        {
+            "shotblaster",
+            new ActionSettings(
+                dataID: "0",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(new Vector2Int(20, 35))},
+                    {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 6)
+            )
+        },
+        {
+            "footstep",
+            new ActionSettings(
+                dataID: "1",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(new Vector2Int(40, 60))},
+                    {"wrist_L", new DevicePowerSettings(new Vector2Int(40, 60))}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 2)
+            )
+        },
+        {
+            "damage",
+            new ActionSettings(
+                dataID: "2",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(30)},
+                    {"wrist_L", new DevicePowerSettings(30)}
+                }
+            )
+        },
+        {
+            "landing",
+            new ActionSettings(
+                dataID: "3",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(0)},
+                    {"wrist_L", new DevicePowerSettings(0)}
+                }
+            )
+        },
+        {
+            "jetpack",
+            new ActionSettings(
+                dataID: "4",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(20)},
+                    {"wrist_L", new DevicePowerSettings(20)}
+                }
+            )
+        },
+        {
+            "chargelauncher",
+            new ActionSettings(
+                dataID: "5",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(20)},
+                    {"wrist_L", new DevicePowerSettings(100)}
+                }
+            )
+        },
+        {
+            "shotlauncher",
+            new ActionSettings(
+                dataID: "6",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(35)},
+                    {"wrist_L", new DevicePowerSettings(new Vector2Int(200, 255))}
+                },
+                useRandomSubID: false
+            )
+        },
+        {
+            "hitlauncher",
+            new ActionSettings(
+                dataID: "7",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(0)},
+                    {"wrist_L", new DevicePowerSettings(0)}
+                }
+            )
+        },
+        {
+            "shotshotgun",
+            new ActionSettings(
+                dataID: "8",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(20)},
+                    {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+                }
+            )
+        },
+        // 迷路関連
+        {
+            "mazeloop",
+            new ActionSettings(
+                dataID: "9",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(60)},
+                    {"wrist_L", new DevicePowerSettings(60)}
+                }
+            )
+        },
+        {
+            "leftnotify",
+            new ActionSettings(
+                dataID: "10",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(
+                        new Vector2Int(155, 255),
+                        new Vector2Int(0, 0)
+                    )},
+                    {"wrist_L", new DevicePowerSettings(
+                        new Vector2Int(155, 255),
+                        new Vector2Int(0, 0)
+                    )}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 3)
+            )
+        },
+        {
+            "rightnotify",
+            new ActionSettings(
+                dataID: "10",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(
+                        new Vector2Int(0, 0),
+                        new Vector2Int(155, 255)
+                    )},
+                    {"wrist_L", new DevicePowerSettings(
+                        new Vector2Int(0, 0),
+                        new Vector2Int(155, 255)
+                    )}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 3)
+            )
+        },
+        {
+            "heartbeat",
+            new ActionSettings(
+                dataID: "11",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(0)},
+                    {"wrist_L", new DevicePowerSettings(0)}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 2)
+            )
+        },
+        // ゴースト関連
+        {
+            "ghostinvite",
+            new ActionSettings(
+                dataID: "12",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(150)},
+                    {"wrist_L", new DevicePowerSettings(150)}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 3)
+            )
+        },
+        {
+            "passwall",
+            new ActionSettings(
+                dataID: "13",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(50)},
+                    {"wrist_L", new DevicePowerSettings(50)}
+                }
+            )
+        },
+        {
+            "ghostleft2right",
+            new ActionSettings(
+                dataID: "14",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(170)},
+                    {"wrist_L", new DevicePowerSettings(170)}
+                }
+            )
+        },
+        {
+            "ghostright2left",
+            new ActionSettings(
+                dataID: "15",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(170)},
+                    {"wrist_L", new DevicePowerSettings(170)}
+                }
+            )
+        },
+        {
+            "ghostcoming",
+            new ActionSettings(
+                dataID: "16",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(0)},
+                    {"wrist_L", new DevicePowerSettings(0)}
+                },
+                useRandomSubID: true,
+                subIDRange: new Vector2Int(0, 2)
+            )
+        },
+        {
+            "ghosteat",
+            new ActionSettings(
+                dataID: "17",
+                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                    {"neck", new DevicePowerSettings(100)},
+                    {"wrist_L", new DevicePowerSettings(100)}
+                }
+            )
+        }
+    };
+        }
+
+        //===============================================
+        // アプリに応じて変更 イベント用
+        //===============================================
+
+        //===============================================
+        // アプリに応じて変更 end
+        //===============================================
+
+        [Header("Device Settings")]
+        [SerializeField]
+        public Dictionary<string, string> DevicePositionMap = new Dictionary<string, string>()
+        {
+            {"neck", "0"},
+            {"chest", "1"},
+            {"abdomen", "2"},
+            {"upperArm_L", "3"},
+            {"upperArm_R", "4"},
+            {"wrist_L", "5"},
+            {"wrist_R", "6"},
+            {"thigh_L", "7"},
+            {"thigh_R", "8"},
+            {"calf_L", "9"},
+            {"calf_R", "10"},
+            {"all", "99"}
+        };
+
+        [Header("Play Type Settings")]
+        [SerializeField]
+        public Dictionary<string, string> PlayTypeMap = new Dictionary<string, string>()
+        {
+            {"oneshot", "0"},
+            {"loopstart", "1"},
+            {"loopstop", "2"},
+            {"oneshot_bg", "3"}
+        };
+
         public delegate void SerialDataReceivedEventHandler(string message);
         public event SerialDataReceivedEventHandler OnDataReceived;
 
@@ -20,26 +387,26 @@ namespace Unity.FPS.Gameplay
         private SerialPort serialPort_;
         private Thread thread_;
         private bool isRunning_ = false;
-
         private string message_;
         private bool isNewMessageReceived_ = false;
 
-        // params for reflecting player status
         public bool _isGhostStepArea = false;
         public bool _disableStepFeedBack = false;
+
+
         void Awake()
         {
+            InitializeActionSettings();
             Open();
             Write("Open");
         }
-
         void Update()
         {
-            // if (isNewMessageReceived_)
-            // {
-            //     OnDataReceived(message_);
-            // }
-            // isNewMessageReceived_ = false;
+            if (isNewMessageReceived_)
+            {
+                OnDataReceived?.Invoke(message_);
+                isNewMessageReceived_ = false;
+            }
         }
 
         void OnDestroy()
@@ -47,7 +414,6 @@ namespace Unity.FPS.Gameplay
             Close();
         }
 
-        /// Serial control functions
         private void Open()
         {
             if (portName != "COM")
@@ -56,10 +422,9 @@ namespace Unity.FPS.Gameplay
                 serialPort_.Open();
                 serialPort_.ReadTimeout = 100;
                 isRunning_ = true;
-                // thread_ = new Thread(Read);
-                // thread_.Start();
             }
         }
+
         private void Close()
         {
             isNewMessageReceived_ = false;
@@ -74,6 +439,7 @@ namespace Unity.FPS.Gameplay
                 serialPort_.Dispose();
             }
         }
+
         private void Read()
         {
             while (isRunning_ && serialPort_ != null && serialPort_.IsOpen)
@@ -89,6 +455,7 @@ namespace Unity.FPS.Gameplay
                 }
             }
         }
+
         public void Write(string message)
         {
             try
@@ -101,256 +468,118 @@ namespace Unity.FPS.Gameplay
             }
         }
 
-
-
-        // // common functions
-        float Map(float value, float FromMin, float FromMax, float ToMin, float ToMax)
+        private float Map(float value, float FromMin, float FromMax, float ToMin, float ToMax)
         {
             return ToMin + (ToMax - ToMin) * ((value - FromMin) / (FromMax - FromMin));
         }
-        int MapToHapbeat(float value)
+
+        private int MapToHapbeat(float value)
         {
             return (int)Map(value, 0, 1, 0, 255);
         }
 
-
-        /// <summary>
-        /// 
-        /// 
-        /// 
-        /// device position numbers [0:neck, 1:chest, 2:abdomen, 
-        /// 3:upperArm_L, 4:upperArm_R, 5:wrist_L, 6:wrist_R, 
-        /// 7:thigh_L, 8:thigh_R, 9:calf_L, 10:calf_R]
-        /// <param name="action"></param>
-        /// <param name="devicePosition"></param>
-        /// <param name="playType">"oneshot", "loopstart", "loopstop",</param>
-        /// <param name="leftPower">0--1</param>
-        /// <param name="rightPower">0--1</param>
-        /// <param name="category">チャンネル。アプリケーションごとに変えるなど。</param>
-        /// </summary>
         public void SendSerial(string action, string devicePos, string playType = "oneshot", float leftPower = -1f, float rightPower = -1f, string category = "0")
         {
-            //  [category, devicePos, dataID, isStereo, L_Vol, R_Vol]
-            string wearerID = "0"; // 複数人数で別々の信号を出したいとき
-            string dataID = "0"; // 振動の種類（同じチャネルで再生ファイルが異なるとき）
-            string subid = "0"; // ランダム再生用（銃撃や足音などで微妙に異なる振動を出したいとき）
-            // 音量について、動的な値は読み出し元で設定、それ以外はここで設定する。
-            string c_leftPower = MapToHapbeat(leftPower).ToString(); //左側の振動強度
-            string c_rightPower = "-1";
-            // c_leftPower : MapToHapbeat(rightPower).ToString(); //右側の振動強度（引数無しなら左と同じ）
-
-            switch (action)
+            if (!actionSettings.ContainsKey(action))
             {
-                case "shotblaster":
-                    dataID = "0";
-                    subid = Random.Range(0, 6).ToString();
-                    if (devicePos == "neck")
-                    {
-                        c_leftPower = Random.Range(20, 35).ToString();
-                    }
-                    else if (devicePos == "wrist_L")
-                    {
-                        c_leftPower = Random.Range(100, 155).ToString();
-                    }
-                    break;
-                case "footstep":
-                    // 奥以降は足音を消す
-                    if (_disableStepFeedBack == true)
-                        return;
-                    dataID = "1";
-                    // subid = "0";
-                    subid = Random.Range(0, 2).ToString();
-                    c_leftPower = Random.Range(40, 60).ToString();
-                    // Debug.Log("_isGhostStepArea: " + _isGhostStepArea);
-                    // playType = "oneshot";
-                    playType = "oneshot_bg";
-                    break;
-                case "damage":
-                    dataID = "2";
-                    c_leftPower = "30";
-                    break;
-                case "landing":
-                    dataID = "3";
-                    break;
-                case "jetpack":
-                    dataID = "4";
-                    c_leftPower = "20";
-                    break;
-                case "chargelauncher":
-                    dataID = "5";
-                    if (devicePos == "neck")
-                    {
-                        c_leftPower = "20";
-                    }
-                    else if (devicePos == "wrist_L")
-                    {
-                        c_leftPower = "100";
-                    }
-                    break;
-                case "shotlauncher":
-                    dataID = "6";
-                    if (devicePos == "neck")
-                    {
-                        c_leftPower = "35";
-                    }
-                    else if (devicePos == "wrist_L")
-                    {
-                        c_leftPower = Random.Range(200, 255).ToString();
-                    }
-                    break;
-                case "hitlauncher":
-                    dataID = "7";
-                    break;
-                case "shotshotgun":
-                    dataID = "8";
-                    if (devicePos == "neck")
-                    {
-                        c_leftPower = "20";
-                    }
-                    else if (devicePos == "wrist_L")
-                    {
-                        c_leftPower = Random.Range(100, 155).ToString();
-                    }
-                    break;
-                // maze actions
-                case "mazeloop":
-                    dataID = "9";
-                    c_leftPower = "60";
-                    // Debug.Log("mazeloop evoked");
-                    break;
-                case "leftnotify":
-                    dataID = "10";
-                    subid = Random.Range(0, 3).ToString();
-                    c_leftPower = Random.Range(155, 255).ToString();
-                    c_rightPower = "0";
-                    break;
-                case "rightnotify":
-                    dataID = "10";
-                    subid = Random.Range(0, 3).ToString();
-                    c_leftPower = "0";
-                    c_rightPower = Random.Range(155, 255).ToString();
-                    break;
-                case "heartbeat":
-                    dataID = "11";
-                    subid = Random.Range(0, 2).ToString();
-                    // no need to set power here
-                    break;
-                case "ghostinvite":
-                    dataID = "12";
-                    subid = Random.Range(0, 3).ToString();
-                    c_leftPower = "150";
-                    break;
-                case "passwall":
-                    dataID = "13";
-                    c_leftPower = "50";
-                    break;
-                case "ghostleft2right":
-                    dataID = "14";
-                    c_leftPower = "170";
-                    break;
-                case "ghostright2left":
-                    dataID = "15";
-                    c_leftPower = "170";
-                    break;
-                case "ghostcoming":
-                    dataID = "16";
-                    subid = Random.Range(0, 2).ToString();
-                    // no need to set power here
-                    break;
-                case "ghosteat":
-                    dataID = "17";
-                    c_leftPower = "100";
-                    break;
-            };
-            // rightPowerについて操作が無ければleftPowerと同じにする
-            if (c_rightPower == "-1")
-            {
-                c_rightPower = c_leftPower;
+                Debug.LogWarning($"Unknown action: {action}");
+                return;
             }
 
-            switch (devicePos)
-            {
-                case "neck":
-                    devicePos = "0";
-                    break;
-                case "chest":
-                    devicePos = "1";
-                    break;
-                case "abdomen":
-                    devicePos = "2";
-                    break;
-                case "upperArm_L":
-                    devicePos = "3";
-                    break;
-                case "upperArm_R":
-                    devicePos = "4";
-                    break;
-                case "wrist_L":
-                    devicePos = "5";
-                    break;
-                case "wrist_R":
-                    devicePos = "6";
-                    break;
-                case "thigh_L":
-                    devicePos = "7";
-                    break;
-                case "thigh_R":
-                    devicePos = "8";
-                    break;
-                case "calf_L":
-                    devicePos = "9";
-                    break;
-                case "calf_R":
-                    devicePos = "10";
-                    break;
-                case "all":
-                    devicePos = "99";
-                    break;
-            };
+            // アクション設定を取得
+            var settings = actionSettings[action];
 
-            switch (playType)
+            // footstepの特別処理
+            if (action == "footstep" && _disableStepFeedBack)
             {
-                case "oneshot":
-                    playType = "0";
-                    break;
-                case "loopstart":
-                    playType = "1";
-                    break;
-                case "loopstop":
-                    playType = "2";
-                    break;
-                case "oneshot_bg":
-                    playType = "3";
-                    break;
+                return;
             }
 
+            // データIDとサブID
+            string dataID = settings.dataID;
+            string subid = settings.useRandomSubID ?
+                Random.Range(settings.subIDRange.x, settings.subIDRange.y).ToString() : "0";
+
+            // デバイス位置のパワー設定を取得
+            string c_leftPower, c_rightPower;
+
+            if (settings.devicePowers != null && settings.devicePowers.ContainsKey(devicePos))
+            {
+                var devicePower = settings.devicePowers[devicePos];
+
+                // 左パワーの決定
+                if (leftPower >= 0)
+                {
+                    c_leftPower = MapToHapbeat(leftPower).ToString();
+                }
+                else if (devicePower.IsLeftPowerRandom)
+                {
+                    c_leftPower = Random.Range(devicePower.leftPowerRange.x, devicePower.leftPowerRange.y).ToString();
+                }
+                else
+                {
+                    c_leftPower = devicePower.leftPowerRange.x.ToString();
+                }
+
+                // 右パワーの決定
+                if (rightPower >= 0)
+                {
+                    c_rightPower = MapToHapbeat(rightPower).ToString();
+                }
+                else if (devicePower.IsRightPowerRandom)
+                {
+                    c_rightPower = Random.Range(devicePower.rightPowerRange.x, devicePower.rightPowerRange.y).ToString();
+                }
+                else
+                {
+                    c_rightPower = devicePower.rightPowerRange.x.ToString();
+                }
+            }
+            else
+            {
+                // デバイス位置の設定がない場合は0を設定
+                c_leftPower = "0";
+                c_rightPower = "0";
+                Debug.LogWarning($"No device power settings for {action} at {devicePos}");
+            }
+
+            // footstepの場合はplayTypeを強制的に変更
+            if (action == "footstep")
+            {
+                playType = "oneshot_bg";
+            }
+
+            // マッピング変換
+            string mappedDevicePos = DevicePositionMap.ContainsKey(devicePos) ? DevicePositionMap[devicePos] : devicePos;
+            string mappedPlayType = PlayTypeMap.ContainsKey(playType) ? PlayTypeMap[playType] : playType;
+
+            // データリストの作成と送信
             List<string> dataList = new List<string>() {
-                category, wearerID, devicePos, dataID, subid, c_leftPower, c_rightPower, playType
-                };
+        category, WearerID, mappedDevicePos, dataID, subid, c_leftPower, c_rightPower, mappedPlayType
+            };
+
             string sendData = string.Join(",", dataList);
             Write(sendData);
 
-            // ghost step
+            // 特殊ケースの処理
             if (action == "footstep" && _isGhostStepArea)
             {
-                // delay randomly
                 float rnd = Random.Range(0.1f, 0.3f);
                 StartCoroutine(DelayedWrite(rnd, sendData));
             }
 
-            if (playType == "2")
+            if (mappedPlayType == "2")
             {
                 for (int i = 0; i < 2; i++)
                 {
                     StartCoroutine(DelayedWrite(0.1f, sendData));
                 }
             }
-        }
-
-        private IEnumerator DelayedWrite(float sec, string sendData)
-        {
-            yield return new WaitForSeconds(sec);
-            Write(sendData);
+            IEnumerator DelayedWrite(float sec, string sendData)
+            {
+                yield return new WaitForSeconds(sec);
+                Write(sendData);
+            }
         }
     }
 }

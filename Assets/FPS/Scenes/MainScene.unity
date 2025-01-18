@@ -48925,7 +48925,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd4b361085d092a4884e70baaf78974c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: COM5
+  Category: 0
+  WearerID: 0
+  DefaultLeftPower: 100
+  DefaultRightPower: 100
+  portName: COM6
   baudRate: 115200
   _isGhostStepArea: 0
   _disableStepFeedBack: 0
