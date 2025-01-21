@@ -113,7 +113,237 @@ namespace Unity.FPS.Gameplay
         public string _Category = "99";      // チャンネル。アプリケーションごとに変えるなど
         public string _WearerID = "99";      // 複数人数で別々の信号を出したいとき
 
-        //     // アクション設定の初期化
+        // アクション設定の初期化
+        private void InitializeActionSettings()
+        {
+            actionSettings = new SerializableDictionary<string, ActionSettings>()
+        {
+            // 武器関連
+            {
+                "shotblaster",
+                new ActionSettings(
+                    dataID: "0",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(new Vector2Int(40, 65))},
+                        {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 6)
+                )
+            },
+            {
+                "footstep",
+                new ActionSettings(
+                    dataID: "1",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(new Vector2Int(40, 60))},
+                        {"wrist_L", new DevicePowerSettings(new Vector2Int(40, 60))}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 2)
+                )
+            },
+            {
+                "damage",
+                new ActionSettings(
+                    dataID: "2",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(40)},
+                        {"wrist_L", new DevicePowerSettings(30)}
+                    }
+                )
+            },
+            {
+                "landing",
+                new ActionSettings(
+                    dataID: "3",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(0)},
+                    }
+                )
+            },
+            {
+                "jetpack",
+                new ActionSettings(
+                    dataID: "4",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(30)},
+                    }
+                )
+            },
+            {
+                "chargelauncher",
+                new ActionSettings(
+                    dataID: "5",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(50)},
+                        {"wrist_L", new DevicePowerSettings(100)}
+                    }
+                )
+            },
+            {
+                "shotlauncher",
+                new ActionSettings(
+                    dataID: "6",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(50)},
+                        {"wrist_L", new DevicePowerSettings(new Vector2Int(200, 255))},
+                        {"all", new DevicePowerSettings(1)},
+                    },
+                    useRandomSubID: false
+                )
+            },
+            {
+                "hitlauncher",
+                new ActionSettings(
+                    dataID: "7",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(0)},
+                    }
+                )
+            },
+            {
+                "shotshotgun",
+                new ActionSettings(
+                    dataID: "8",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(40)},
+                        {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+                    }
+                )
+            },
+            // 迷路関連
+            {
+                "mazeloop",
+                new ActionSettings(
+                    dataID: "9",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(60)},
+                        {"wrist_L", new DevicePowerSettings(60)}
+                    }
+                )
+            },
+            {
+                "leftnotify",
+                new ActionSettings(
+                    dataID: "10",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(
+                            new Vector2Int(155, 255),
+                            new Vector2Int(0, 0)
+                        )},
+                        {"wrist_L", new DevicePowerSettings(
+                            new Vector2Int(155, 255),
+                            new Vector2Int(0, 0)
+                        )}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 3)
+                )
+            },
+            {
+                "rightnotify",
+                new ActionSettings(
+                    dataID: "10",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(
+                            new Vector2Int(0, 0),
+                            new Vector2Int(155, 255)
+                        )},
+                        {"wrist_L", new DevicePowerSettings(
+                            new Vector2Int(0, 0),
+                            new Vector2Int(155, 255)
+                        )}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 3)
+                )
+            },
+            {
+                "heartbeat",
+                new ActionSettings(
+                    dataID: "11",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(0)},
+                        {"wrist_L", new DevicePowerSettings(0)}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 2)
+                )
+            },
+            // ゴースト関連
+            {
+                "ghostinvite",
+                new ActionSettings(
+                    dataID: "12",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(150)},
+                        {"wrist_L", new DevicePowerSettings(150)}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 3)
+                )
+            },
+            {
+                "passwall",
+                new ActionSettings(
+                    dataID: "13",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(50)},
+                        {"wrist_L", new DevicePowerSettings(50)}
+                    }
+                )
+            },
+            {
+                "ghostleft2right",
+                new ActionSettings(
+                    dataID: "14",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(170)},
+                        {"wrist_L", new DevicePowerSettings(170)}
+                    }
+                )
+            },
+            {
+                "ghostright2left",
+                new ActionSettings(
+                    dataID: "15",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(170)},
+                        {"wrist_L", new DevicePowerSettings(170)}
+                    }
+                )
+            },
+            {
+                "ghostcoming",
+                new ActionSettings(
+                    dataID: "16",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(0)},
+                        {"wrist_L", new DevicePowerSettings(0)}
+                    },
+                    useRandomSubID: true,
+                    subIDRange: new Vector2Int(0, 2)
+                )
+            },
+            {
+                "ghosteat",
+                new ActionSettings(
+                    dataID: "17",
+                    devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
+                        {"neck", new DevicePowerSettings(100)},
+                        {"wrist_L", new DevicePowerSettings(100)}
+                    }
+                )
+            }
+        };
+        }
+
+        //===============================================
+        // アプリに応じて変更 イベント用
+        //===============================================
+
+        // アクション設定の初期化
         //     private void InitializeActionSettings()
         //     {
         //         actionSettings = new SerializableDictionary<string, ActionSettings>()
@@ -124,8 +354,7 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "0",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(new Vector2Int(20, 35))},
-        //                 {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+        //                 {"neck", new DevicePowerSettings(new Vector2Int(50, 75))},
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 6)
@@ -136,8 +365,7 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "1",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(new Vector2Int(40, 60))},
-        //                 {"wrist_L", new DevicePowerSettings(new Vector2Int(40, 60))}
+        //                 {"neck", new DevicePowerSettings(new Vector2Int(30, 50))},
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 2)
@@ -148,18 +376,16 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "2",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(30)},
-        //                 {"wrist_L", new DevicePowerSettings(30)}
+        //                 {"neck", new DevicePowerSettings(40)},
         //             }
         //         )
         //     },
         //     {
         //         "landing",
         //         new ActionSettings(
-        //             dataID: "3",
+        //             dataID: "3",5
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(0)},
-        //                 {"wrist_L", new DevicePowerSettings(0)}
         //             }
         //         )
         //     },
@@ -168,8 +394,7 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "4",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(20)},
-        //                 {"wrist_L", new DevicePowerSettings(20)}
+        //                 {"neck", new DevicePowerSettings(30)},
         //             }
         //         )
         //     },
@@ -178,8 +403,7 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "5",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(20)},
-        //                 {"wrist_L", new DevicePowerSettings(100)}
+        //                 {"neck", new DevicePowerSettings(50)},
         //             }
         //         )
         //     },
@@ -188,8 +412,8 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "6",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(35)},
-        //                 {"wrist_L", new DevicePowerSettings(new Vector2Int(200, 255))}
+        //                 {"neck", new DevicePowerSettings(50)},
+        //                 {"all", new DevicePowerSettings(0)},
         //             },
         //             useRandomSubID: false
         //         )
@@ -200,7 +424,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "7",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(0)},
-        //                 {"wrist_L", new DevicePowerSettings(0)}
         //             }
         //         )
         //     },
@@ -209,8 +432,7 @@ namespace Unity.FPS.Gameplay
         //         new ActionSettings(
         //             dataID: "8",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-        //                 {"neck", new DevicePowerSettings(20)},
-        //                 {"wrist_L", new DevicePowerSettings(new Vector2Int(100, 155))}
+        //                 {"neck", new DevicePowerSettings(50)},
         //             }
         //         )
         //     },
@@ -221,7 +443,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "9",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(60)},
-        //                 {"wrist_L", new DevicePowerSettings(60)}
         //             }
         //         )
         //     },
@@ -234,10 +455,6 @@ namespace Unity.FPS.Gameplay
         //                     new Vector2Int(155, 255),
         //                     new Vector2Int(0, 0)
         //                 )},
-        //                 {"wrist_L", new DevicePowerSettings(
-        //                     new Vector2Int(155, 255),
-        //                     new Vector2Int(0, 0)
-        //                 )}
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 3)
@@ -252,10 +469,6 @@ namespace Unity.FPS.Gameplay
         //                     new Vector2Int(0, 0),
         //                     new Vector2Int(155, 255)
         //                 )},
-        //                 {"wrist_L", new DevicePowerSettings(
-        //                     new Vector2Int(0, 0),
-        //                     new Vector2Int(155, 255)
-        //                 )}
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 3)
@@ -267,7 +480,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "11",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(0)},
-        //                 {"wrist_L", new DevicePowerSettings(0)}
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 2)
@@ -280,7 +492,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "12",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(150)},
-        //                 {"wrist_L", new DevicePowerSettings(150)}
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 3)
@@ -292,7 +503,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "13",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(50)},
-        //                 {"wrist_L", new DevicePowerSettings(50)}
         //             }
         //         )
         //     },
@@ -302,7 +512,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "14",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(170)},
-        //                 {"wrist_L", new DevicePowerSettings(170)}
         //             }
         //         )
         //     },
@@ -312,7 +521,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "15",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(170)},
-        //                 {"wrist_L", new DevicePowerSettings(170)}
         //             }
         //         )
         //     },
@@ -322,7 +530,6 @@ namespace Unity.FPS.Gameplay
         //             dataID: "16",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(0)},
-        //                 {"wrist_L", new DevicePowerSettings(0)}
         //             },
         //             useRandomSubID: true,
         //             subIDRange: new Vector2Int(0, 2)
@@ -334,220 +541,11 @@ namespace Unity.FPS.Gameplay
         //             dataID: "17",
         //             devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
         //                 {"neck", new DevicePowerSettings(100)},
-        //                 {"wrist_L", new DevicePowerSettings(100)}
         //             }
         //         )
         //     }
         // };
         //     }
-
-        //===============================================
-        // アプリに応じて変更 イベント用
-        //===============================================
-
-        // アクション設定の初期化
-        private void InitializeActionSettings()
-        {
-            actionSettings = new SerializableDictionary<string, ActionSettings>()
-    {
-        // 武器関連
-        {
-            "shotblaster",
-            new ActionSettings(
-                dataID: "0",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(new Vector2Int(50, 75))},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 6)
-            )
-        },
-        {
-            "footstep",
-            new ActionSettings(
-                dataID: "1",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(new Vector2Int(30, 50))},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 2)
-            )
-        },
-        {
-            "damage",
-            new ActionSettings(
-                dataID: "2",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(40)},
-                }
-            )
-        },
-        {
-            "landing",
-            new ActionSettings(
-                dataID: "3",5
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(0)},
-                }
-            )
-        },
-        {
-            "jetpack",
-            new ActionSettings(
-                dataID: "4",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(30)},
-                }
-            )
-        },
-        {
-            "chargelauncher",
-            new ActionSettings(
-                dataID: "5",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(50)},
-                }
-            )
-        },
-        {
-            "shotlauncher",
-            new ActionSettings(
-                dataID: "6",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(50)},
-                    {"all", new DevicePowerSettings(0)},
-                },
-                useRandomSubID: false
-            )
-        },
-        {
-            "hitlauncher",
-            new ActionSettings(
-                dataID: "7",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(0)},
-                }
-            )
-        },
-        {
-            "shotshotgun",
-            new ActionSettings(
-                dataID: "8",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(50)},
-                }
-            )
-        },
-        // 迷路関連
-        {
-            "mazeloop",
-            new ActionSettings(
-                dataID: "9",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(60)},
-                }
-            )
-        },
-        {
-            "leftnotify",
-            new ActionSettings(
-                dataID: "10",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(
-                        new Vector2Int(155, 255),
-                        new Vector2Int(0, 0)
-                    )},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 3)
-            )
-        },
-        {
-            "rightnotify",
-            new ActionSettings(
-                dataID: "10",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(
-                        new Vector2Int(0, 0),
-                        new Vector2Int(155, 255)
-                    )},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 3)
-            )
-        },
-        {
-            "heartbeat",
-            new ActionSettings(
-                dataID: "11",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(0)},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 2)
-            )
-        },
-        // ゴースト関連
-        {
-            "ghostinvite",
-            new ActionSettings(
-                dataID: "12",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(150)},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 3)
-            )
-        },
-        {
-            "passwall",
-            new ActionSettings(
-                dataID: "13",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(50)},
-                }
-            )
-        },
-        {
-            "ghostleft2right",
-            new ActionSettings(
-                dataID: "14",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(170)},
-                }
-            )
-        },
-        {
-            "ghostright2left",
-            new ActionSettings(
-                dataID: "15",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(170)},
-                }
-            )
-        },
-        {
-            "ghostcoming",
-            new ActionSettings(
-                dataID: "16",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(0)},
-                },
-                useRandomSubID: true,
-                subIDRange: new Vector2Int(0, 2)
-            )
-        },
-        {
-            "ghosteat",
-            new ActionSettings(
-                dataID: "17",
-                devicePowers: new SerializableDictionary<string, DevicePowerSettings> {
-                    {"neck", new DevicePowerSettings(100)},
-                }
-            )
-        }
-    };
-        }
 
         //===============================================
         // アプリに応じて変更 end

@@ -464,9 +464,9 @@ namespace Unity.FPS.Game
             }
             else if (WeaponName == "Disc Launcher")
             {
+                _SerialHandler.SendSerial("shotlauncher", "all", "loopstop");
                 _SerialHandler.SendSerial("shotlauncher", "wrist_L", "oneshot");
                 _SerialHandler.SendSerial("shotlauncher", "neck", "oneshot");
-                _SerialHandler.SendSerial("shotlauncher", "all", "loopstop");
             }
             else if (WeaponName == "Shotgun")
             {
